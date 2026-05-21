@@ -343,6 +343,15 @@ class TrayHubHandler(BaseHTTPRequestHandler):
             return
 
         elif path == '/api/produtos':
+            # GET - Listar produtos
+            produtos = load_json(PRODUTOS_FILE, [])
+            alerta = query.get('alerta', [None])[0]
+            if alerta:
+                produtos = [p for p in produtos if p['stock'] <= 5]
+            self._json_response({'produtos': produtos})
+            return
+
+        elif path == '/api/produtos/criar':
             # POST - Criar novo produto
             produtos = load_json(PRODUTOS_FILE, [])
             
@@ -386,7 +395,7 @@ class TrayHubHandler(BaseHTTPRequestHandler):
                 self._json_response({'error': 'Produto não encontrado'}, 404)
                 return
             
-            # PUT - Atualizar produto
+            # POST - Atualizar produto
             if 'name' in data:
                 produtos[produto_idx]['name'] = data['name']
             if 'price' in data:
