@@ -155,25 +155,25 @@ def save_json(filepath, data):
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 
-# Inicializar dados demo se não existirem
-def init_demo_data():
+# Inicializar dados vazios (sem demo)
+def init_empty_data():
     if not os.path.exists(LOJAS_FILE):
-        save_json(LOJAS_FILE, [DEMO_LOJA])
+        save_json(LOJAS_FILE, [])
     if not os.path.exists(PEDIDOS_FILE):
-        save_json(PEDIDOS_FILE, DEMO_PEDIDOS)
+        save_json(PEDIDOS_FILE, [])
     if not os.path.exists(PRODUTOS_FILE):
-        save_json(PRODUTOS_FILE, DEMO_PRODUTOS)
+        save_json(PRODUTOS_FILE, [])
     if not os.path.exists(CLIENTES_FILE):
-        save_json(CLIENTES_FILE, DEMO_CLIENTES)
+        save_json(CLIENTES_FILE, [])
     if not os.path.exists(ATIVIDADES_FILE):
-        save_json(ATIVIDADES_FILE, DEMO_ATIVIDADES)
+        save_json(ATIVIDADES_FILE, [])
     if not os.path.exists(CHAT_FILE):
-        save_json(CHAT_FILE, DEMO_CHAT)
+        save_json(CHAT_FILE, [])
     if not os.path.exists(CONFIG_FILE):
-        save_json(CONFIG_FILE, {"demo_mode": True, "created_at": datetime.now().isoformat()})
+        save_json(CONFIG_FILE, {"demo_mode": False, "created_at": datetime.now().isoformat()})
 
 
-init_demo_data()
+init_empty_data()
 
 
 class TrayHubHandler(BaseHTTPRequestHandler):
