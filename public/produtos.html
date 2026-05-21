@@ -6,6 +6,89 @@
     <title>Produtos - TrayHub AI</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/base.css">
+    <style>
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal {
+            background: white;
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+        }
+        .modal-header {
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .modal-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius);
+            border: none;
+            background: var(--gray-100);
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-body {
+            padding: 1.25rem;
+        }
+        .modal-footer {
+            padding: 1rem 1.25rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+        }
+        .emoji-picker {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
+        }
+        .emoji-option {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius);
+            border: 2px solid var(--border);
+            background: white;
+            cursor: pointer;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+        .emoji-option:hover {
+            border-color: var(--primary);
+        }
+        .emoji-option.selected {
+            border-color: var(--primary);
+            background: var(--primary-50);
+        }
+    </style>
 </head>
 <body>
     <div class="mobile-header">
@@ -18,6 +101,94 @@
 
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
     <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Modal Produto -->
+    <div class="modal-overlay" id="modalProduto">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">Novo Produto</div>
+                <button class="modal-close" onclick="fecharModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="produtoId">
+                <div class="form-group">
+                    <label class="form-label">Ícone do Produto</label>
+                    <div class="emoji-picker" id="emojiPicker">
+                        <button class="emoji-option" onclick="selectEmoji('👟')">👟</button>
+                        <button class="emoji-option" onclick="selectEmoji('🎒')">🎒</button>
+                        <button class="emoji-option" onclick="selectEmoji('🎧')">🎧</button>
+                        <button class="emoji-option" onclick="selectEmoji('👕')">👕</button>
+                        <button class="emoji-option" onclick="selectEmoji('⌚')">⌚</button>
+                        <button class="emoji-option" onclick="selectEmoji('👖')">👖</button>
+                        <button class="emoji-option" onclick="selectEmoji('👗')">👗</button>
+                        <button class="emoji-option" onclick="selectEmoji('👜')">👜</button>
+                        <button class="emoji-option" onclick="selectEmoji('💄')">💄</button>
+                        <button class="emoji-option" onclick="selectEmoji('🏠')">🏠</button>
+                        <button class="emoji-option" onclick="selectEmoji('📱')">📱</button>
+                        <button class="emoji-option" onclick="selectEmoji('💻')">💻</button>
+                    </div>
+                    <input type="hidden" id="produtoEmoji" value="📦">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Nome do Produto *</label>
+                    <input type="text" class="form-input" id="produtoNome" placeholder="Ex: Tênis Nike Air Max">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Preço (R$) *</label>
+                        <input type="number" class="form-input" id="produtoPreco" placeholder="0,00" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Preço Promocional (R$)</label>
+                        <input type="number" class="form-input" id="produtoPromo" placeholder="0,00" step="0.01">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Estoque *</label>
+                        <input type="number" class="form-input" id="produtoEstoque" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Categoria *</label>
+                        <select class="form-select" id="produtoCategoria">
+                            <option value="Calçados">Calçados</option>
+                            <option value="Roupas">Roupas</option>
+                            <option value="Acessórios">Acessórios</option>
+                            <option value="Eletrônicos">Eletrônicos</option>
+                            <option value="Beleza">Beleza</option>
+                            <option value="Casa">Casa</option>
+                            <option value="Esportes">Esportes</option>
+                            <option value="Geral">Geral</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="fecharModal()">Cancelar</button>
+                <button class="btn btn-primary" onclick="salvarProduto()">Salvar Produto</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Confirmação Exclusão -->
+    <div class="modal-overlay" id="modalExcluir">
+        <div class="modal" style="max-width: 400px;">
+            <div class="modal-header">
+                <div class="modal-title">Confirmar Exclusão</div>
+                <button class="modal-close" onclick="fecharModalExcluir()">×</button>
+            </div>
+            <div class="modal-body">
+                <p style="color: var(--text-secondary); font-size: 0.9rem;">
+                    Tem certeza que deseja excluir o produto <strong id="nomeProdutoExcluir"></strong>?
+                    Esta ação não pode ser desfeita.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="fecharModalExcluir()">Cancelar</button>
+                <button class="btn btn-danger" onclick="confirmarExclusao()">Excluir</button>
+            </div>
+        </div>
+    </div>
 
     <div class="app">
         <aside class="sidebar" id="sidebar">
@@ -78,6 +249,7 @@
                         <input type="text" class="form-input" id="searchProdutos" placeholder="Buscar produtos..." oninput="filtrarProdutos()">
                     </div>
                     <button class="btn btn-warning" onclick="mostrarAlertas()">⚠️ Alertas</button>
+                    <button class="btn btn-primary" onclick="novoProduto()">+ Novo Produto</button>
                 </div>
             </div>
 
@@ -85,7 +257,7 @@
                 <div class="empty-state" style="grid-column: 1/-1;">
                     <div class="empty-state-icon">📭</div>
                     <p>Nenhum produto cadastrado</p>
-                    <p style="font-size: 0.8rem; margin-top: 0.5rem;">Conecte sua loja Tray para sincronizar produtos</p>
+                    <p style="font-size: 0.8rem; margin-top: 0.5rem;">Clique em "Novo Produto" para começar</p>
                 </div>
             </div>
         </main>
@@ -116,6 +288,7 @@
     <script>
         const API_URL = window.location.origin;
         let todosProdutos = [];
+        let produtoExcluirId = null;
 
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('open');
@@ -158,6 +331,7 @@
         }
 
         function formatMoney(value) {
+            if (!value) return 'R$ 0,00';
             return 'R$ ' + value.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
         }
 
@@ -218,7 +392,10 @@
                     </div>
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <div style="font-size: 0.8rem; color: var(--text-muted);">${p.sales} vendas</div>
-                        <button class="btn btn-outline btn-sm" onclick="editarProduto('${p.id}')">Editar</button>
+                        <div style="display: flex; gap: 0.4rem;">
+                            <button class="btn btn-outline btn-sm" onclick="editarProduto('${p.id}')">✏️ Editar</button>
+                            <button class="btn btn-ghost btn-sm" style="color: var(--danger);" onclick="excluirProduto('${p.id}', '${p.name}')">🗑️</button>
+                        </div>
                     </div>
                 </div>
             `).join('');
@@ -243,8 +420,131 @@
             showToast('Alertas de Estoque', `${alertas.length} produtos precisam de reposição`, 'warning');
         }
 
-        function editarProduto(id) {
-            showToast('Info', 'Edição de produto em desenvolvimento', 'info');
+        // Modal functions
+        function novoProduto() {
+            document.getElementById('modalTitle').textContent = 'Novo Produto';
+            document.getElementById('produtoId').value = '';
+            document.getElementById('produtoNome').value = '';
+            document.getElementById('produtoPreco').value = '';
+            document.getElementById('produtoPromo').value = '';
+            document.getElementById('produtoEstoque').value = '';
+            document.getElementById('produtoCategoria').value = 'Geral';
+            document.getElementById('produtoEmoji').value = '📦';
+            selectEmoji('📦');
+            document.getElementById('modalProduto').classList.add('active');
+        }
+
+        async function editarProduto(id) {
+            try {
+                const produto = await apiFetch(`/api/produtos/${id}`);
+                if (produto.error) {
+                    showToast('Erro', 'Produto não encontrado', 'error');
+                    return;
+                }
+
+                document.getElementById('modalTitle').textContent = 'Editar Produto';
+                document.getElementById('produtoId').value = produto.id;
+                document.getElementById('produtoNome').value = produto.name;
+                document.getElementById('produtoPreco').value = produto.price;
+                document.getElementById('produtoPromo').value = produto.promotional_price || '';
+                document.getElementById('produtoEstoque').value = produto.stock;
+                document.getElementById('produtoCategoria').value = produto.category;
+                document.getElementById('produtoEmoji').value = produto.image;
+                selectEmoji(produto.image);
+                document.getElementById('modalProduto').classList.add('active');
+            } catch (e) {
+                showToast('Erro', 'Falha ao carregar produto', 'error');
+            }
+        }
+
+        function selectEmoji(emoji) {
+            document.getElementById('produtoEmoji').value = emoji;
+            document.querySelectorAll('.emoji-option').forEach(btn => {
+                btn.classList.toggle('selected', btn.textContent === emoji);
+            });
+        }
+
+        function fecharModal() {
+            document.getElementById('modalProduto').classList.remove('active');
+        }
+
+        async function salvarProduto() {
+            const id = document.getElementById('produtoId').value;
+            const nome = document.getElementById('produtoNome').value.trim();
+            const preco = parseFloat(document.getElementById('produtoPreco').value);
+            const promo = document.getElementById('produtoPromo').value;
+            const estoque = parseInt(document.getElementById('produtoEstoque').value);
+            const categoria = document.getElementById('produtoCategoria').value;
+            const emoji = document.getElementById('produtoEmoji').value;
+
+            if (!nome || isNaN(preco) || isNaN(estoque)) {
+                showToast('Erro', 'Preencha todos os campos obrigatórios', 'error');
+                return;
+            }
+
+            const dados = {
+                name: nome,
+                price: preco,
+                promotional_price: promo ? parseFloat(promo) : null,
+                stock: estoque,
+                category: categoria,
+                image: emoji
+            };
+
+            try {
+                let response;
+                if (id) {
+                    // Editar
+                    response = await apiFetch(`/api/produtos/${id}`, {
+                        method: 'POST',
+                        body: JSON.stringify(dados)
+                    });
+                    if (response.success) {
+                        showToast('Sucesso', `Produto "${nome}" atualizado!`);
+                    }
+                } else {
+                    // Criar
+                    response = await apiFetch('/api/produtos', {
+                        method: 'POST',
+                        body: JSON.stringify(dados)
+                    });
+                    if (response.success) {
+                        showToast('Sucesso', `Produto "${nome}" criado!`);
+                    }
+                }
+
+                fecharModal();
+                loadProdutos();
+            } catch (e) {
+                showToast('Erro', 'Falha ao salvar produto', 'error');
+            }
+        }
+
+        function excluirProduto(id, nome) {
+            produtoExcluirId = id;
+            document.getElementById('nomeProdutoExcluir').textContent = nome;
+            document.getElementById('modalExcluir').classList.add('active');
+        }
+
+        function fecharModalExcluir() {
+            document.getElementById('modalExcluir').classList.remove('active');
+            produtoExcluirId = null;
+        }
+
+        async function confirmarExclusao() {
+            if (!produtoExcluirId) return;
+
+            try {
+                await apiFetch('/api/produtos/excluir', {
+                    method: 'POST',
+                    body: JSON.stringify({ produto_id: produtoExcluirId })
+                });
+                showToast('Sucesso', 'Produto excluído!');
+                fecharModalExcluir();
+                loadProdutos();
+            } catch (e) {
+                showToast('Erro', 'Falha ao excluir produto', 'error');
+            }
         }
 
         async function sendAgentMessage(text) {
@@ -273,6 +573,14 @@
                 body.insertAdjacentHTML('beforeend', `<div class="ai-message bot">❌ Desculpe, tive um problema!</div>`);
             }
         }
+
+        // Fechar modal ao clicar fora
+        document.getElementById('modalProduto').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('modalProduto')) fecharModal();
+        });
+        document.getElementById('modalExcluir').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('modalExcluir')) fecharModalExcluir();
+        });
 
         document.addEventListener('DOMContentLoaded', () => {
             loadProdutos();

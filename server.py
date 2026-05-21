@@ -343,11 +343,97 @@ class TrayHubHandler(BaseHTTPRequestHandler):
             return
 
         elif path == '/api/produtos':
+            # POST - Criar novo produto
             produtos = load_json(PRODUTOS_FILE, [])
-            alerta = query.get('alerta', [None])[0]
-            if alerta:
-                produtos = [p for p in produtos if p['stock'] <= 5]
-            self._json_response({'produtos': produtos})
+            
+            # Gerar ID único
+            novo_id = str(max([int(p['id']) for p in produtos] + [0]) + 1)
+            
+            novo_produto = {
+                'id': novo_id,
+                'name': data.get('name', 'Novo Produto'),
+                'price': float(data.get('price', 0)),
+                'promotional_price': float(data.get('promotional_price', 0)) if data.get('promotional_price') else None,
+                'stock': int(data.get('stock', 0)),
+                'category': data.get('category', 'Geral'),
+                'sales': 0,
+                'image': data.get('image', '📦')
+            }
+            
+            produtos.append(novo_produto)
+            save_json(PRODUTOS_FILE, produtos)
+            
+            # Registrar atividade
+            atividades = load_json(ATIVIDADES_FILE, [])
+            atividades.insert(0, {
+                'id': str(len(atividades) + 1),
+                'type': 'success',
+                'message': f'Produto "{novo_produto["name"]}" criado',
+                'time': datetime.now().isoformat(),
+                'read': False
+            })
+            save_json(ATIVIDADES_FILE, atividades)
+            
+            self._json_response({'success': True, 'produto': novo_produto})
+            return
+
+        elif path.startswith('/api/produtos/'):
+            produto_id = path.split('/')[-1]
+            produtos = load_json(PRODUTOS_FILE, [])
+            produto_idx = next((i for i, p in enumerate(produtos) if p['id'] == produto_id), None)
+            
+            if produto_idx is None:
+                self._json_response({'error': 'Produto não encontrado'}, 404)
+                return
+            
+            # PUT - Atualizar produto
+            if 'name' in data:
+                produtos[produto_idx]['name'] = data['name']
+            if 'price' in data:
+                produtos[produto_idx]['price'] = float(data['price'])
+            if 'promotional_price' in data:
+                produtos[produto_idx]['promotional_price'] = float(data['promotional_price']) if data['promotional_price'] else None
+            if 'stock' in data:
+                produtos[produto_idx]['stock'] = int(data['stock'])
+            if 'category' in data:
+                produtos[produto_idx]['category'] = data['category']
+            if 'image' in data:
+                produtos[produto_idx]['image'] = data['image']
+            
+            save_json(PRODUTOS_FILE, produtos)
+            
+            # Registrar atividade
+            atividades = load_json(ATIVIDADES_FILE, [])
+            atividades.insert(0, {
+                'id': str(len(atividades) + 1),
+                'type': 'success',
+                'message': f'Produto "{produtos[produto_idx]["name"]}" atualizado',
+                'time': datetime.now().isoformat(),
+                'read': False
+            })
+            save_json(ATIVIDADES_FILE, atividades)
+            
+            self._json_response({'success': True, 'produto': produtos[produto_idx]})
+            return
+
+        elif path == '/api/produtos/excluir':
+            produto_id = data.get('produto_id')
+            produtos = load_json(PRODUTOS_FILE, [])
+            produtos = [p for p in produtos if p['id'] != produto_id]
+            save_json(PRODUTOS_FILE, produtos)
+            
+            # Registrar atividade
+            atividades = load_json(ATIVIDADES_FILE, [])
+            atividades.insert(0, {
+                'id': str(len(atividades) + 1),
+                'type': 'alert',
+                'message': f'Produto #{produto_id} excluído',
+                'time': datetime.now().isoformat(),
+                'read': False
+            })
+            save_json(ATIVIDADES_FILE, atividades)
+            
+            self._json_response({'success': True})
             return
 
         elif path == '/api/clientes':
