@@ -310,19 +310,32 @@
         }
 
         async function salvarConfig() {
+            const enabled = document.getElementById('whatsappEnabled').checked;
+            const phone = document.getElementById('whatsappPhone').value.trim();
+            const apikey = document.getElementById('whatsappApiKey').value.trim();
+            
+            console.log('Salvando config:', { enabled, phone, apikey });
+
+            if (enabled && (!phone || phone === '')) {
+                showToast('Erro', 'Preencha o número de telefone para ativar', 'error');
+                document.getElementById('whatsappPhone').focus();
+                return;
+            }
+            
+            if (enabled && (!apikey || apikey === '')) {
+                showToast('Erro', 'Preencha a API Key para ativar', 'error');
+                document.getElementById('whatsappApiKey').focus();
+                return;
+            }
+
             const config = {
-                enabled: document.getElementById('whatsappEnabled').checked,
-                phone: document.getElementById('whatsappPhone').value.trim(),
-                apikey: document.getElementById('whatsappApiKey').value.trim(),
+                enabled: enabled,
+                phone: phone,
+                apikey: apikey,
                 auto_reply: document.getElementById('autoReply').checked,
                 notify_new_orders: document.getElementById('notifyOrders').checked,
                 notify_low_stock: document.getElementById('notifyStock').checked
             };
-
-            if (config.enabled && (!config.phone || !config.apikey)) {
-                showToast('Erro', 'Preencha o número e API Key para ativar', 'error');
-                return;
-            }
 
             try {
                 const response = await apiFetch('/api/whatsapp/config', {
@@ -332,7 +345,7 @@
 
                 if (response.success) {
                     showToast('Sucesso', 'Configuração salva!');
-                    updateStatus(config.enabled && config.phone && config.apikey);
+                    updateStatus(enabled && phone && apikey);
                 } else {
                     showToast('Erro', 'Falha ao salvar', 'error');
                 }
