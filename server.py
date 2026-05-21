@@ -216,30 +216,32 @@ class TrayHubHandler(BaseHTTPRequestHandler):
         query = urllib.parse.parse_qs(parsed.query)
 
         # Arquivos estáticos
+        PUBLIC_DIR = os.path.join(os.path.dirname(__file__), 'public')
+        
         if path == '/' or path == '/index.html':
-            self._serve_file('/root/trayhub-ai/public/index.html', 'text/html')
+            self._serve_file(os.path.join(PUBLIC_DIR, 'index.html'), 'text/html')
             return
         elif path == '/conectar':
-            self._serve_file('/root/trayhub-ai/public/conectar.html', 'text/html')
+            self._serve_file(os.path.join(PUBLIC_DIR, 'conectar.html'), 'text/html')
             return
         elif path == '/pedidos':
-            self._serve_file('/root/trayhub-ai/public/pedidos.html', 'text/html')
+            self._serve_file(os.path.join(PUBLIC_DIR, 'pedidos.html'), 'text/html')
             return
         elif path == '/produtos':
-            self._serve_file('/root/trayhub-ai/public/produtos.html', 'text/html')
+            self._serve_file(os.path.join(PUBLIC_DIR, 'produtos.html'), 'text/html')
             return
         elif path == '/clientes':
-            self._serve_file('/root/trayhub-ai/public/clientes.html', 'text/html')
+            self._serve_file(os.path.join(PUBLIC_DIR, 'clientes.html'), 'text/html')
             return
         elif path == '/relatorios':
-            self._serve_file('/root/trayhub-ai/public/relatorios.html', 'text/html')
+            self._serve_file(os.path.join(PUBLIC_DIR, 'relatorios.html'), 'text/html')
             return
         elif path.startswith('/css/'):
-            filepath = f'/root/trayhub-ai/public{path}'
+            filepath = os.path.join(PUBLIC_DIR, path.lstrip('/'))
             self._serve_file(filepath, 'text/css')
             return
         elif path.startswith('/js/'):
-            filepath = f'/root/trayhub-ai/public{path}'
+            filepath = os.path.join(PUBLIC_DIR, path.lstrip('/'))
             self._serve_file(filepath, 'application/javascript')
             return
 
