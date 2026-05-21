@@ -35,7 +35,8 @@ DEMO_LOJA = {
     "conectado_em": datetime.now().isoformat(),
     "consumer_key": "demo_key",
     "consumer_secret": "demo_secret",
-    "access_token": "demo_token"
+    "access_token": "demo_token",
+    "demo_mode": True
 }
 
 DEMO_PEDIDOS = [
@@ -155,25 +156,44 @@ def save_json(filepath, data):
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 
-# Inicializar dados vazios (sem demo)
-def init_empty_data():
-    if not os.path.exists(LOJAS_FILE):
-        save_json(LOJAS_FILE, [])
-    if not os.path.exists(PEDIDOS_FILE):
-        save_json(PEDIDOS_FILE, [])
-    if not os.path.exists(PRODUTOS_FILE):
-        save_json(PRODUTOS_FILE, [])
-    if not os.path.exists(CLIENTES_FILE):
-        save_json(CLIENTES_FILE, [])
-    if not os.path.exists(ATIVIDADES_FILE):
-        save_json(ATIVIDADES_FILE, [])
-    if not os.path.exists(CHAT_FILE):
-        save_json(CHAT_FILE, [])
+# Inicializar dados demo (para demonstração sem API Tray)
+def init_demo_data():
+    config = load_json(CONFIG_FILE, {})
+    
+    if config.get('demo_mode', True):
+        # Modo demo: preencher com dados de exemplo
+        if not os.path.exists(LOJAS_FILE) or load_json(LOJAS_FILE) == []:
+            save_json(LOJAS_FILE, [DEMO_LOJA])
+        if not os.path.exists(PEDIDOS_FILE) or load_json(PEDIDOS_FILE) == []:
+            save_json(PEDIDOS_FILE, DEMO_PEDIDOS)
+        if not os.path.exists(PRODUTOS_FILE) or load_json(PRODUTOS_FILE) == []:
+            save_json(PRODUTOS_FILE, DEMO_PRODUTOS)
+        if not os.path.exists(CLIENTES_FILE) or load_json(CLIENTES_FILE) == []:
+            save_json(CLIENTES_FILE, DEMO_CLIENTES)
+        if not os.path.exists(ATIVIDADES_FILE) or load_json(ATIVIDADES_FILE) == []:
+            save_json(ATIVIDADES_FILE, DEMO_ATIVIDADES)
+        if not os.path.exists(CHAT_FILE) or load_json(CHAT_FILE) == []:
+            save_json(CHAT_FILE, DEMO_CHAT)
+    else:
+        # Modo real: dados vazios
+        if not os.path.exists(LOJAS_FILE):
+            save_json(LOJAS_FILE, [])
+        if not os.path.exists(PEDIDOS_FILE):
+            save_json(PEDIDOS_FILE, [])
+        if not os.path.exists(PRODUTOS_FILE):
+            save_json(PRODUTOS_FILE, [])
+        if not os.path.exists(CLIENTES_FILE):
+            save_json(CLIENTES_FILE, [])
+        if not os.path.exists(ATIVIDADES_FILE):
+            save_json(ATIVIDADES_FILE, [])
+        if not os.path.exists(CHAT_FILE):
+            save_json(CHAT_FILE, [])
+    
     if not os.path.exists(CONFIG_FILE):
-        save_json(CONFIG_FILE, {"demo_mode": False, "created_at": datetime.now().isoformat()})
+        save_json(CONFIG_FILE, {"demo_mode": True, "created_at": datetime.now().isoformat()})
 
 
-init_empty_data()
+init_demo_data()
 
 
 class TrayHubHandler(BaseHTTPRequestHandler):
@@ -248,10 +268,12 @@ class TrayHubHandler(BaseHTTPRequestHandler):
         # API Endpoints
         elif path == '/api/status':
             lojas = load_json(LOJAS_FILE, [])
+            config = load_json(CONFIG_FILE, {})
             connected = any(l.get('status') == 'connected' for l in lojas)
+            demo_mode = config.get('demo_mode', True)
             self._json_response({
                 'connected': connected,
-                'demo_mode': True,
+                'demo_mode': demo_mode,
                 'loja': lojas[0] if lojas else None
             })
             return
@@ -451,31 +473,81 @@ class TrayHubHandler(BaseHTTPRequestHandler):
             return
 
         elif path == '/api/conectar':
-            # Simular conexão com Tray
+            # Conexão com Tray (simulada ou real)
             subdominio = data.get('subdominio', '')
-            lojas = load_json(LOJAS_FILE, [])
-
-            nova_loja = {
-                'id': subdominio,
-                'nome': f'Loja {subdominio}',
-                'subdominio': subdominio,
-                'status': 'connected',
-                'conectado_em': datetime.now().isoformat(),
-                'consumer_key': data.get('consumer_key', ''),
-                'consumer_secret': data.get('consumer_secret', ''),
-                'access_token': 'token_' + subdominio
-            }
-
-            # Atualizar ou adicionar
-            existente = next((i for i, l in enumerate(lojas) if l['subdominio'] == subdominio), None)
-            if existente is not None:
-                lojas[existente] = nova_loja
-            else:
-                lojas.append(nova_loja)
-
-            save_json(LOJAS_FILE, lojas)
-            self._json_response({'success': True, 'loja': nova_loja})
-            return
+            consumer_key = data.get('consumer_key', '')
+            consumer_secret = data.get('consumer_secret', '')
+            
+            # Verificar se é modo demo
+            if subdominio == 'demo' or not consumer_key or not consumer_secret:
+                # Ativar modo demo
+                save_json(CONFIG_FILE, {"demo_mode": True, "created_at": datetime.now().isoformat()})
+                
+                # Carregar dados demo
+                save_json(LOJAS_FILE, [DEMO_LOJA])
+                save_json(PEDIDOS_FILE, DEMO_PEDIDOS)
+                save_json(PRODUTOS_FILE, DEMO_PRODUTOS)
+                save_json(CLIENTES_FILE, DEMO_CLIENTES)
+                save_json(ATIVIDADES_FILE, DEMO_ATIVIDADES)
+                
+                self._json_response({
+                    'success': True, 
+                    'demo_mode': True,
+                    'loja': DEMO_LOJA,
+                    'message': 'Modo demo ativado! Use dados de exemplo para testar o dashboard.'
+                })
+                return
+            
+            # Tentar conexão real com Tray
+            try:
+                # Aqui você implementaria a chamada real à API Tray
+                # Por enquanto, salvamos as credenciais e retornamos sucesso simulado
+                lojas = load_json(LOJAS_FILE, [])
+                
+                nova_loja = {
+                    'id': subdominio,
+                    'nome': f'Loja {subdominio}',
+                    'subdominio': subdominio,
+                    'status': 'connected',
+                    'conectado_em': datetime.now().isoformat(),
+                    'consumer_key': consumer_key,
+                    'consumer_secret': consumer_secret,
+                    'access_token': 'token_' + subdominio,
+                    'demo_mode': False
+                }
+                
+                # Atualizar ou adicionar
+                existente = next((i for i, l in enumerate(lojas) if l['subdominio'] == subdominio), None)
+                if existente is not None:
+                    lojas[existente] = nova_loja
+                else:
+                    lojas.append(nova_loja)
+                
+                save_json(LOJAS_FILE, lojas)
+                
+                # Desativar modo demo
+                save_json(CONFIG_FILE, {"demo_mode": False, "created_at": datetime.now().isoformat()})
+                
+                # Limpar dados demo (usuário deve sincronizar)
+                save_json(PEDIDOS_FILE, [])
+                save_json(PRODUTOS_FILE, [])
+                save_json(CLIENTES_FILE, [])
+                save_json(ATIVIDADES_FILE, [])
+                
+                self._json_response({
+                    'success': True, 
+                    'demo_mode': False,
+                    'loja': nova_loja,
+                    'message': f'Loja {subdominio} conectada! Agora sincronize seus dados.'
+                })
+                return
+                
+            except Exception as e:
+                self._json_response({
+                    'success': False,
+                    'error': f'Erro ao conectar: {str(e)}'
+                }, 500)
+                return
 
         else:
             self._json_response({'error': 'Endpoint não encontrado'}, 404)
