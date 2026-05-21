@@ -1,0 +1,10 @@
+# TrayHub AI - Dependências
+# Python 3.9+
+
+# Servidor HTTP built-in (não precisa de dependências externas)
+# Usando apenas bibliotecas padrão do Python:
+# - http.server
+# - json
+# - os
+# - urllib
+# - datetime

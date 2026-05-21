@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatórios - TrayHub AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/base.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="mobile-header">
+        <button class="mobile-menu-btn" onclick="toggleSidebar()">
+            <span></span><span></span><span></span>
+        </button>
+        <div class="logo-text">TrayHub <span>AI</span></div>
+        <div style="width: 36px;"></div>
+    </div>
+
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="app">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">🤖</div>
+                    <div class="logo-text">TrayHub <span>AI</span></div>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title">Menu Principal</div>
+                <button class="nav-item" onclick="goTo('/index.html')">
+                    <span class="nav-icon">📊</span> Dashboard
+                </button>
+                <button class="nav-item" onclick="goTo('/pedidos')">
+                    <span class="nav-icon">📦</span> Pedidos
+                    <span class="nav-badge" id="badgePedidos">0</span>
+                </button>
+                <button class="nav-item" onclick="goTo('/produtos')">
+                    <span class="nav-icon">🏷️</span> Produtos
+                    <span class="nav-badge" id="badgeProdutos">0</span>
+                </button>
+                <button class="nav-item" onclick="goTo('/clientes')">
+                    <span class="nav-icon">👥</span> Clientes
+                </button>
+                <button class="nav-item active" onclick="goTo('/relatorios')">
+                    <span class="nav-icon">📈</span> Relatórios
+                </button>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title">Sistema</div>
+                <button class="nav-item" onclick="goTo('/conectar')">
+                    <span class="nav-icon">🔌</span> Conectar Tray
+                </button>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">A</div>
+                    <div class="user-details">
+                        <div class="user-name">Administrador</div>
+                        <div class="user-role">Loja Demo</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main">
+            <div class="header">
+                <div class="header-title">
+                    <h1>📈 Relatórios</h1>
+                    <p>Análise completa do seu e-commerce</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-primary" onclick="exportarRelatorio()">📥 Exportar</button>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon green">💰</div>
+                    <div class="stat-value" id="relTotalVendas">R$ 0,00</div>
+                    <div class="stat-label">Total em Vendas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon blue">📦</div>
+                    <div class="stat-value" id="relTotalPedidos">0</div>
+                    <div class="stat-label">Total de Pedidos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon purple">📊</div>
+                    <div class="stat-value" id="relTaxaConversao">0%</div>
+                    <div class="stat-label">Taxa de Conversão</div>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">🏆 Top Produtos</h3>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Produto</th>
+                                    <th>Vendas</th>
+                                    <th>Preço</th>
+                                </tr>
+                            </thead>
+                            <tbody id="topProdutosTable">
+                                <tr><td colspan="3" style="text-align: center;">Carregando...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">👥 Clientes Mais Valiosos</h3>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Cliente</th>
+                                    <th>Pedidos</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="topClientesTable">
+                                <tr><td colspan="3" style="text-align: center;">Carregando...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section" style="margin-top: 1.5rem;">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">📊 Vendas por Categoria</h3>
+                    </div>
+                    <canvas id="categoriaChart" height="100"></canvas>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- AI Agent -->
+    <div class="ai-agent">
+        <button class="ai-agent-toggle" onclick="toggleAgent()">🤖</button>
+        <div class="ai-agent-panel" id="aiAgentPanel">
+            <div class="ai-agent-header">
+                <div class="ai-agent-avatar">🤖</div>
+                <div class="ai-agent-info">
+                    <h4>TrayBot</h4>
+                    <p>Assistente de E-commerce</p>
+                </div>
+            </div>
+            <div class="ai-agent-body" id="aiAgentBody">
+                <div class="ai-message bot">
+                    Olá! Sou o <strong>TrayBot</strong>. Posso ajudar com seus pedidos, estoque e vendas!
+                </div>
+            </div>
+            <div class="ai-agent-footer">
+                <input type="text" id="aiAgentInput" placeholder="Digite sua pergunta..." onkeypress="if(event.key==='Enter')sendAgentMessage()">
+                <button onclick="sendAgentMessage()">➤</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = window.location.origin;
+        let categoriaChart;
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
+        }
+
+        function toggleAgent() {
+            document.getElementById('aiAgentPanel').classList.toggle('open');
+        }
+
+        function goTo(url) {
+            window.location.href = url;
+        }
+
+        function showToast(title, message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+            toast.innerHTML = `
+                <div class="toast-icon">${icons[type]}</div>
+                <div>
+                    <div style="font-weight: 600; font-size: 0.85rem;">${title}</div>
+                    <div style="font-size: 0.8rem; opacity: 0.8;">${message}</div>
+                </div>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('toast-exit');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        async function apiFetch(endpoint, options = {}) {
+            const response = await fetch(`${API_URL}${endpoint}`, {
+                ...options,
+                headers: { 'Content-Type': 'application/json', ...options.headers }
+            });
+            return response.json();
+        }
+
+        function formatMoney(value) {
+            return 'R$ ' + value.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
+
+        async function loadRelatorios() {
+            try {
+                const data = await apiFetch('/api/relatorios');
+
+                // Stats
+                document.getElementById('relTotalVendas').textContent = formatMoney(data.total_vendas);
+                document.getElementById('relTotalPedidos').textContent = data.total_pedidos;
+                document.getElementById('relTaxaConversao').textContent = data.taxa_conversao + '%';
+
+                // Top produtos
+                const produtosHtml = data.top_produtos.map(p => `
+                    <tr>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="font-size: 1.25rem;">${p.image}</span>
+                                <span>${p.name}</span>
+                            </div>
+                        </td>
+                        <td><strong>${p.sales}</strong></td>
+                        <td>${formatMoney(p.price)}</td>
+                    </tr>
+                `).join('');
+                document.getElementById('topProdutosTable').innerHTML = produtosHtml;
+
+                // Top clientes
+                const clientesHtml = data.top_clientes.map(c => `
+                    <tr>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <div style="width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent-light)); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.8rem;">${c.name.charAt(0)}</div>
+                                <span>${c.name}</span>
+                            </div>
+                        </td>
+                        <td><strong>${c.orders}</strong></td>
+                        <td><strong style="color: var(--success);">${formatMoney(c.total_spent)}</strong></td>
+                    </tr>
+                `).join('');
+                document.getElementById('topClientesTable').innerHTML = clientesHtml;
+
+                // Gráfico de categorias
+                const ctx = document.getElementById('categoriaChart').getContext('2d');
+                if (categoriaChart) categoriaChart.destroy();
+                categoriaChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(data.vendas_categoria),
+                        datasets: [{
+                            label: 'Vendas (R$)',
+                            data: Object.values(data.vendas_categoria),
+                            backgroundColor: 'rgba(99, 102, 241, 0.8)',
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: v => 'R$ ' + v,
+                                    color: '#6b6b80'
+                                },
+                                grid: { color: 'rgba(255,255,255,0.05)' }
+                            },
+                            x: {
+                                ticks: { color: '#6b6b80' },
+                                grid: { display: false }
+                            }
+                        }
+                    }
+                });
+
+            } catch (e) {
+                showToast('Erro', 'Falha ao carregar relatórios', 'error');
+            }
+        }
+
+        function exportarRelatorio() {
+            showToast('Info', 'Exportação em desenvolvimento', 'info');
+        }
+
+        async function sendAgentMessage(text) {
+            const input = document.getElementById('aiAgentInput');
+            const message = text || input.value;
+            if (!message.trim()) return;
+
+            const body = document.getElementById('aiAgentBody');
+            body.insertAdjacentHTML('beforeend', `<div class="ai-message user">${message}</div>`);
+            if (!text) input.value = '';
+
+            const typingId = 'typing-' + Date.now();
+            body.insertAdjacentHTML('beforeend', `<div class="ai-message typing" id="${typingId}"><span></span><span></span><span></span></div>`);
+            body.scrollTop = body.scrollHeight;
+
+            try {
+                const response = await apiFetch('/api/chat', {
+                    method: 'POST',
+                    body: JSON.stringify({ message })
+                });
+                document.getElementById(typingId)?.remove();
+                body.insertAdjacentHTML('beforeend', `<div class="ai-message bot">${response.message}</div>`);
+                body.scrollTop = body.scrollHeight;
+            } catch (e) {
+                document.getElementById(typingId)?.remove();
+                body.insertAdjacentHTML('beforeend', `<div class="ai-message bot">❌ Desculpe, tive um problema!</div>`);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadRelatorios();
+        });
+    </script>
+</body>
+</html>

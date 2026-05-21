@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: trayhub-ai
+    runtime: python
+    plan: free
+    buildCommand: ""
+    startCommand: "python3 server.py"
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.9"
+      - key: PORT
+        value: "10000"

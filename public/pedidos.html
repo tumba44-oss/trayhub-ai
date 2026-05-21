@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedidos - TrayHub AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/base.css">
+</head>
+<body>
+    <div class="mobile-header">
+        <button class="mobile-menu-btn" onclick="toggleSidebar()">
+            <span></span><span></span><span></span>
+        </button>
+        <div class="logo-text">TrayHub <span>AI</span></div>
+        <div style="width: 36px;"></div>
+    </div>
+
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="app">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">🤖</div>
+                    <div class="logo-text">TrayHub <span>AI</span></div>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title">Menu Principal</div>
+                <button class="nav-item" onclick="goTo('/index.html')">
+                    <span class="nav-icon">📊</span> Dashboard
+                </button>
+                <button class="nav-item active" onclick="goTo('/pedidos')">
+                    <span class="nav-icon">📦</span> Pedidos
+                    <span class="nav-badge" id="badgePedidos">0</span>
+                </button>
+                <button class="nav-item" onclick="goTo('/produtos')">
+                    <span class="nav-icon">🏷️</span> Produtos
+                    <span class="nav-badge" id="badgeProdutos">0</span>
+                </button>
+                <button class="nav-item" onclick="goTo('/clientes')">
+                    <span class="nav-icon">👥</span> Clientes
+                </button>
+                <button class="nav-item" onclick="goTo('/relatorios')">
+                    <span class="nav-icon">📈</span> Relatórios
+                </button>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title">Sistema</div>
+                <button class="nav-item" onclick="goTo('/conectar')">
+                    <span class="nav-icon">🔌</span> Conectar Tray
+                </button>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">A</div>
+                    <div class="user-details">
+                        <div class="user-name">Administrador</div>
+                        <div class="user-role">Loja Demo</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main">
+            <div class="header">
+                <div class="header-title">
+                    <h1>📦 Pedidos</h1>
+                    <p>Gerencie todos os pedidos da sua loja</p>
+                </div>
+                <div class="header-actions">
+                    <div class="search-box">
+                        <input type="text" class="form-input" id="searchPedidos" placeholder="Buscar pedidos..." oninput="filtrarPedidos()">
+                    </div>
+                </div>
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" onclick="filtrarPorStatus('todos')">Todos</button>
+                <button class="tab" onclick="filtrarPorStatus('pending')">⏳ Pendentes</button>
+                <button class="tab" onclick="filtrarPorStatus('approved')">✅ Aprovados</button>
+                <button class="tab" onclick="filtrarPorStatus('shipped')">🚚 Enviados</button>
+                <button class="tab" onclick="filtrarPorStatus('delivered')">📦 Entregues</button>
+                <button class="tab" onclick="filtrarPorStatus('canceled')">❌ Cancelados</button>
+            </div>
+
+            <div class="card">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Pedido</th>
+                                <th>Cliente</th>
+                                <th>Produtos</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Data</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pedidosTable">
+                            <tr><td colspan="7" style="text-align: center;">Carregando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- AI Agent -->
+    <div class="ai-agent">
+        <button class="ai-agent-toggle" onclick="toggleAgent()">🤖</button>
+        <div class="ai-agent-panel" id="aiAgentPanel">
+            <div class="ai-agent-header">
+                <div class="ai-agent-avatar">🤖</div>
+                <div class="ai-agent-info">
+                    <h4>TrayBot</h4>
+                    <p>Assistente de E-commerce</p>
+                </div>
+            </div>
+            <div class="ai-agent-body" id="aiAgentBody">
+                <div class="ai-message bot">
+                    Olá! Sou o <strong>TrayBot</strong>. Posso ajudar com seus pedidos, estoque e vendas!
+                </div>
+            </div>
+            <div class="ai-agent-footer">
+                <input type="text" id="aiAgentInput" placeholder="Digite sua pergunta..." onkeypress="if(event.key==='Enter')sendAgentMessage()">
+                <button onclick="sendAgentMessage()">➤</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = window.location.origin;
+        let todosPedidos = [];
+        let statusAtual = 'todos';
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
+        }
+
+        function toggleAgent() {
+            document.getElementById('aiAgentPanel').classList.toggle('open');
+        }
+
+        function goTo(url) {
+            window.location.href = url;
+        }
+
+        function showToast(title, message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+            toast.innerHTML = `
+                <div class="toast-icon">${icons[type]}</div>
+                <div>
+                    <div style="font-weight: 600; font-size: 0.85rem;">${title}</div>
+                    <div style="font-size: 0.8rem; opacity: 0.8;">${message}</div>
+                </div>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('toast-exit');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        async function apiFetch(endpoint, options = {}) {
+            const response = await fetch(`${API_URL}${endpoint}`, {
+                ...options,
+                headers: { 'Content-Type': 'application/json', ...options.headers }
+            });
+            return response.json();
+        }
+
+        function formatMoney(value) {
+            return 'R$ ' + value.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
+
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('pt-BR') + ' ' + date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function getStatusLabel(status) {
+            const labels = {
+                'pending': '⏳ Pendente',
+                'approved': '✅ Aprovado',
+                'shipped': '🚚 Enviado',
+                'delivered': '📦 Entregue',
+                'canceled': '❌ Cancelado'
+            };
+            return labels[status] || status;
+        }
+
+        function getStatusClass(status) {
+            return `status status-${status}`;
+        }
+
+        function getNextStatus(status) {
+            const flow = {
+                'pending': 'approved',
+                'approved': 'shipped',
+                'shipped': 'delivered'
+            };
+            return flow[status] || status;
+        }
+
+        function getStatusAction(status) {
+            const actions = {
+                'pending': 'Aprovar',
+                'approved': 'Enviar',
+                'shipped': 'Entregar'
+            };
+            return actions[status] || null;
+        }
+
+        async function loadPedidos() {
+            try {
+                const data = await apiFetch('/api/pedidos');
+                todosPedidos = data.pedidos;
+                renderPedidos();
+            } catch (e) {
+                showToast('Erro', 'Falha ao carregar pedidos', 'error');
+            }
+        }
+
+        function renderPedidos() {
+            const search = document.getElementById('searchPedidos').value.toLowerCase();
+            let pedidos = todosPedidos;
+
+            if (statusAtual !== 'todos') {
+                pedidos = pedidos.filter(p => p.status === statusAtual);
+            }
+
+            if (search) {
+                pedidos = pedidos.filter(p => 
+                    p.id.includes(search) ||
+                    p.customer.name.toLowerCase().includes(search) ||
+                    p.customer.email.toLowerCase().includes(search)
+                );
+            }
+
+            const html = pedidos.map(p => {
+                const nextStatus = getNextStatus(p.status);
+                const actionLabel = getStatusAction(p.status);
+                const produtosList = p.items.map(i => i.name).join(', ');
+
+                return `
+                    <tr>
+                        <td><strong>#${p.id}</strong></td>
+                        <td>
+                            <div style="font-weight: 500;">${p.customer.name}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">${p.customer.email}</div>
+                        </td>
+                        <td>
+                            <div style="font-size: 0.8rem; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${produtosList}</div>
+                        </td>
+                        <td><strong>${formatMoney(p.total)}</strong></td>
+                        <td><span class="${getStatusClass(p.status)}">${getStatusLabel(p.status)}</span></td>
+                        <td>${formatDate(p.created_at)}</td>
+                        <td>
+                            <div style="display: flex; gap: 0.5rem;">
+                                ${actionLabel ? `<button class="btn btn-primary btn-sm" onclick="atualizarStatus('${p.id}', '${nextStatus}')">${actionLabel}</button>` : ''}
+                                ${p.status === 'pending' ? `<button class="btn btn-danger btn-sm" onclick="atualizarStatus('${p.id}', 'canceled')">Cancelar</button>` : ''}
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            document.getElementById('pedidosTable').innerHTML = html || '<tr><td colspan="7" style="text-align: center; padding: 2rem;"><div class="empty-state"><div class="empty-state-icon">📭</div><p>Nenhum pedido encontrado</p></div></td></tr>';
+        }
+
+        function filtrarPedidos() {
+            renderPedidos();
+        }
+
+        function filtrarPorStatus(status) {
+            statusAtual = status;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            renderPedidos();
+        }
+
+        async function atualizarStatus(pedidoId, novoStatus) {
+            try {
+                await apiFetch('/api/pedidos/status', {
+                    method: 'POST',
+                    body: JSON.stringify({ pedido_id: pedidoId, status: novoStatus })
+                });
+                showToast('Sucesso', `Pedido #${pedidoId} atualizado!`);
+                loadPedidos();
+            } catch (e) {
+                showToast('Erro', 'Falha ao atualizar pedido', 'error');
+            }
+        }
+
+        async function sendAgentMessage(text) {
+            const input = document.getElementById('aiAgentInput');
+            const message = text || input.value;
+            if (!message.trim()) return;
+
+            const body = document.getElementById('aiAgentBody');
+            body.insertAdjacentHTML('beforeend', `<div class="ai-message user">${message}</div>`);
+            if (!text) input.value = '';
+
+            const typingId = 'typing-' + Date.now();
+            body.insertAdjacentHTML('beforeend', `<div class="ai-message typing" id="${typingId}"><span></span><span></span><span></span></div>`);
+            body.scrollTop = body.scrollHeight;
+
+            try {
+                const response = await apiFetch('/api/chat', {
+                    method: 'POST',
+                    body: JSON.stringify({ message })
+                });
+                document.getElementById(typingId)?.remove();
+                body.insertAdjacentHTML('beforeend', `<div class="ai-message bot">${response.message}</div>`);
+                body.scrollTop = body.scrollHeight;
+            } catch (e) {
+                document.getElementById(typingId)?.remove();
+                body.insertAdjacentHTML('beforeend', `<div class="ai-message bot">❌ Desculpe, tive um problema!</div>`);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadPedidos();
+        });
+    </script>
+</body>
+</html>

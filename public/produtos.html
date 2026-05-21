@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produtos - TrayHub AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/base.css">
+</head>
+<body>
+    <div class="mobile-header">
+        <button class="mobile-menu-btn" onclick="toggleSidebar()">
+            <span></span><span></span><span></span>
+        </button>
+        <div class="logo-text">TrayHub <span>AI</span></div>
+        <div style="width: 36px;"></div>
+    </div>
+
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="app">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">🤖</div>
+                    <div class="logo-text">TrayHub <span>AI</span></div>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title">Menu Principal</div>
+                <button class="nav-item" onclick="goTo('/index.html')">
+                    <span class="nav-icon">📊</span> Dashboard
+                </button>
+                <button class="nav-item" onclick="goTo('/pedidos')">
+                    <span class="nav-icon">📦</span> Pedidos
+                    <span class="nav-badge" id="badgePedidos">0</span>
+                </button>
+                <button class="nav-item active" onclick="goTo('/produtos')">
+                    <span class="nav-icon">🏷️</span> Produtos
+                    <span class="nav-badge" id="badgeProdutos">0</span>
+                </button>
+                <button class="nav-item" onclick="goTo('/clientes')">
+                    <span class="nav-icon">👥</span> Clientes
+                </button>
+                <button class="nav-item" onclick="goTo('/relatorios')">
+                    <span class="nav-icon">📈</span> Relatórios
+                </button>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title">Sistema</div>
+                <button class="nav-item" onclick="goTo('/conectar')">
+                    <span class="nav-icon">🔌</span> Conectar Tray
+                </button>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">A</div>
+                    <div class="user-details">
+                        <div class="user-name">Administrador</div>
+                        <div class="user-role">Loja Demo</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main">
+            <div class="header">
+                <div class="header-title">
+                    <h1>🏷️ Produtos</h1>
+                    <p>Gerencie seu catálogo e estoque</p>
+                </div>
+                <div class="header-actions">
+                    <div class="search-box">
+                        <input type="text" class="form-input" id="searchProdutos" placeholder="Buscar produtos..." oninput="filtrarProdutos()">
+                    </div>
+                    <button class="btn btn-warning" onclick="mostrarAlertas()">⚠️ Alertas</button>
+                </div>
+            </div>
+
+            <div class="grid-4" id="produtosGrid">
+                <!-- Produtos serão carregados aqui -->
+            </div>
+        </main>
+    </div>
+
+    <!-- AI Agent -->
+    <div class="ai-agent">
+        <button class="ai-agent-toggle" onclick="toggleAgent()">🤖</button>
+        <div class="ai-agent-panel" id="aiAgentPanel">
+            <div class="ai-agent-header">
+                <div class="ai-agent-avatar">🤖</div>
+                <div class="ai-agent-info">
+                    <h4>TrayBot</h4>
+                    <p>Assistente de E-commerce</p>
+                </div>
+            </div>
+            <div class="ai-agent-body" id="aiAgentBody">
+                <div class="ai-message bot">
+                    Olá! Sou o <strong>TrayBot</strong>. Posso ajudar com seus pedidos, estoque e vendas!
+                </div>
+            </div>
+            <div class="ai-agent-footer">
+                <input type="text" id="aiAgentInput" placeholder="Digite sua pergunta..." onkeypress="if(event.key==='Enter')sendAgentMessage()">
+                <button onclick="sendAgentMessage()">➤</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = window.location.origin;
+        let todosProdutos = [];
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
+        }
+
+        function toggleAgent() {
+            document.getElementById('aiAgentPanel').classList.toggle('open');
+        }
+
+        function goTo(url) {
+            window.location.href = url;
+        }
+
+        function showToast(title, message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+            toast.innerHTML = `
+                <div class="toast-icon">${icons[type]}</div>
+                <div>
+                    <div style="font-weight: 600; font-size: 0.85rem;">${title}</div>
+                    <div style="font-size: 0.8rem; opacity: 0.8;">${message}</div>
+                </div>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('toast-exit');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        async function apiFetch(endpoint, options = {}) {
+            const response = await fetch(`${API_URL}${endpoint}`, {
+                ...options,
+                headers: { 'Content-Type': 'application/json', ...options.headers }
+            });
+            return response.json();
+        }
+
+        function formatMoney(value) {
+            return 'R$ ' + value.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
+
+        function getStockColor(stock) {
+            if (stock <= 3) return 'var(--danger)';
+            if (stock <= 8) return 'var(--warning)';
+            return 'var(--success)';
+        }
+
+        function getStockLabel(stock) {
+            if (stock <= 3) return '🔴 Crítico';
+            if (stock <= 8) return '🟡 Baixo';
+            return '🟢 OK';
+        }
+
+        async function loadProdutos() {
+            try {
+                const data = await apiFetch('/api/produtos');
+                todosProdutos = data.produtos;
+                renderProdutos();
+
+                // Atualizar badge
+                const alertas = todosProdutos.filter(p => p.stock <= 5).length;
+                document.getElementById('badgeProdutos').textContent = alertas;
+            } catch (e) {
+                showToast('Erro', 'Falha ao carregar produtos', 'error');
+            }
+        }
+
+        function renderProdutos() {
+            const search = document.getElementById('searchProdutos').value.toLowerCase();
+            let produtos = todosProdutos;
+
+            if (search) {
+                produtos = produtos.filter(p =>
+                    p.name.toLowerCase().includes(search) ||
+                    p.category.toLowerCase().includes(search)
+                );
+            }
+
+            const html = produtos.map(p => `
+                <div class="card" style="position: relative; overflow: hidden;">
+                    <div style="position: absolute; top: 0; left: 0; right: 0; height: 3px; background: ${getStockColor(p.stock)};"></div>
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                        <div style="font-size: 2.5rem;">${p.image}</div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600; font-size: 0.95rem;">${p.name}</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">${p.category}</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                        <div>
+                            <div style="font-size: 1.1rem; font-weight: 700;">${formatMoney(p.promotional_price || p.price)}</div>
+                            ${p.promotional_price ? `<div style="font-size: 0.8rem; color: var(--text-muted); text-decoration: line-through;">${formatMoney(p.price)}</div>` : ''}
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 0.85rem; font-weight: 600; color: ${getStockColor(p.stock)};">${p.stock} unidades</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">${getStockLabel(p.stock)}</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">${p.sales} vendas</div>
+                        <button class="btn btn-outline btn-sm" onclick="editarProduto('${p.id}')">Editar</button>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('produtosGrid').innerHTML = html || '<div class="empty-state" style="grid-column: 1/-1;"><div class="empty-state-icon">📭</div><p>Nenhum produto encontrado</p></div>';
+        }
+
+        function filtrarProdutos() {
+            renderProdutos();
+        }
+
+        function mostrarAlertas() {
+            const alertas = todosProdutos.filter(p => p.stock <= 5);
+            if (alertas.length === 0) {
+                showToast('Info', 'Nenhum produto com estoque baixo', 'info');
+                return;
+            }
+
+            const lista = alertas.map(p => `• ${p.name}: ${p.stock} unidades`).join('\n');
+            showToast('Alertas de Estoque', `${alertas.length} produtos precisam de reposição`, 'warning');
+        }
+
+        function editarProduto(id) {
+            showToast('Info', 'Edição de produto em desenvolvimento', 'info');
+        }
+
+        async function sendAgentMessage(text) {
+            const input = document.getElementById('aiAgentInput');
+            const message = text || input.value;
+            if (!message.trim()) return;
+
+            const body = document.getElementById('aiAgentBody');
+            body.insertAdjacentHTML('beforeend', `<div class="ai-message user">${message}</div>`);
+            if (!text) input.value = '';
+
+            const typingId = 'typing-' + Date.now();
+            body.insertAdjacentHTML('beforeend', `<div class="ai-message typing" id="${typingId}"><span></span><span></span><span></span></div>`);
+            body.scrollTop = body.scrollHeight;
+
+            try {
+                const response = await apiFetch('/api/chat', {
+                    method: 'POST',
+                    body: JSON.stringify({ message })
+                });
+                document.getElementById(typingId)?.remove();
+                body.insertAdjacentHTML('beforeend', `<div class="ai-message bot">${response.message}</div>`);
+                body.scrollTop = body.scrollHeight;
+            } catch (e) {
+                document.getElementById(typingId)?.remove();
+                body.insertAdjacentHTML('beforeend', `<div class="ai-message bot">❌ Desculpe, tive um problema!</div>`);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProdutos();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrayHub AI - Dashboard Inteligente</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/base.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="mobile-header">
+        <button class="mobile-menu-btn" onclick="toggleSidebar()">
+            <span></span><span></span><span></span>
+        </button>
+        <div class="logo-text">TrayHub <span>AI</span></div>
+        <div style="width: 36px;"></div>
+    </div>
+
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="app">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">🤖</div>
+                    <div class="logo-text">TrayHub <span>AI</span></div>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title">Menu Principal</div>
+                <button class="nav-item active" onclick="showPage('dashboard')">
+                    <span class="nav-icon">📊</span> Dashboard
+                </button>
+                <button class="nav-item" onclick="showPage('pedidos')">
+                    <span class="nav-icon">📦</span> Pedidos
+                    <span class="nav-badge" id="badgePedidos">0</span>
+                </button>
+                <button class="nav-item" onclick="showPage('produtos')">
+                    <span class="nav-icon">🏷️</span> Produtos
+                    <span class="nav-badge" id="badgeProdutos">0</span>
+                </button>
+                <button class="nav-item" onclick="showPage('clientes')">
+                    <span class="nav-icon">👥</span> Clientes
+                </button>
+                <button class="nav-item" onclick="showPage('relatorios')">
+                    <span class="nav-icon">📈</span> Relatórios
+                </button>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title">Sistema</div>
+                <button class="nav-item" onclick="showPage('conectar')">
+                    <span class="nav-icon">🔌</span> Conectar Tray
+                </button>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">A</div>
+                    <div class="user-details">
+                        <div class="user-name">Administrador</div>
+                        <div class="user-role">Loja Demo</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main" id="mainContent">
+            <!-- Dashboard -->
+            <div id="page-dashboard" class="page-content">
+                <div class="header">
+                    <div class="header-title">
+                        <h1>📊 Dashboard</h1>
+                        <p>Visão geral da sua loja em tempo real</p>
+                    </div>
+                    <div class="header-actions">
+                        <span class="connection-status connected" id="connectionStatus">● Conectado</span>
+                        <button class="btn btn-primary" onclick="atualizarDados()">🔄 Atualizar</button>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon green">💰</div>
+                        <div class="stat-value" id="statVendas">R$ 0,00</div>
+                        <div class="stat-label">Total em Vendas</div>
+                        <div class="stat-change positive">+12% este mês</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon blue">📦</div>
+                        <div class="stat-value" id="statPedidos">0</div>
+                        <div class="stat-label">Total de Pedidos</div>
+                        <div class="stat-change positive">+5 hoje</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon orange">👥</div>
+                        <div class="stat-value" id="statClientes">0</div>
+                        <div class="stat-label">Clientes</div>
+                        <div class="stat-change positive">+3 novos</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon purple">📈</div>
+                        <div class="stat-value" id="statTicket">R$ 0,00</div>
+                        <div class="stat-label">Ticket Médio</div>
+                        <div class="stat-change positive">+8%</div>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">📈 Vendas dos Últimos 7 Dias</h3>
+                        </div>
+                        <canvas id="vendasChart" height="200"></canvas>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">📊 Pedidos por Status</h3>
+                        </div>
+                        <canvas id="statusChart" height="200"></canvas>
+                    </div>
+                </div>
+
+                <div class="section" style="margin-top: 1.5rem;">
+                    <div class="section-header">
+                        <h3 class="section-title">🔔 Atividades Recentes</h3>
+                        <button class="btn btn-outline btn-sm" onclick="marcarTodasLidas()">Marcar lidas</button>
+                    </div>
+                    <div class="card">
+                        <div id="atividadesList">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">📭</div>
+                                <p>Carregando atividades...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-header">
+                        <h3 class="section-title">📦 Pedidos Recentes</h3>
+                        <button class="btn btn-outline btn-sm" onclick="showPage('pedidos')">Ver todos</button>
+                    </div>
+                    <div class="card">
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Pedido</th>
+                                        <th>Cliente</th>
+                                        <th>Total</th>
+                                        <th>Status</th>
+                                        <th>Data</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pedidosRecentes">
+                                    <tr><td colspan="5" style="text-align: center;">Carregando...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- AI Agent -->
+    <div class="ai-agent">
+        <button class="ai-agent-toggle" onclick="toggleAgent()">🤖</button>
+        <div class="ai-agent-panel" id="aiAgentPanel">
+            <div class="ai-agent-header">
+                <div class="ai-agent-avatar">🤖</div>
+                <div class="ai-agent-info">
+                    <h4>TrayBot</h4>
+                    <p>Assistente de E-commerce</p>
+                </div>
+            </div>
+            <div class="ai-agent-body" id="aiAgentBody">
+                <div class="ai-message bot">
+                    Olá! Sou o <strong>TrayBot</strong>, seu assistente de e-commerce. Posso ajudar você a gerenciar pedidos, monitorar estoque, analisar vendas e muito mais!
+                </div>
+                <div class="ai-suggestions">
+                    <button class="ai-suggestion" onclick="sendAgentMessage('Quantos pedidos pendentes?')">Pedidos pendentes</button>
+                    <button class="ai-suggestion" onclick="sendAgentMessage('Qual o estoque atual?')">Ver estoque</button>
+                    <button class="ai-suggestion" onclick="sendAgentMessage('Quanto vendi hoje?')">Vendas hoje</button>
+                    <button class="ai-suggestion" onclick="sendAgentMessage('Me dê uma dica de vendas')">Dica de vendas</button>
+                </div>
+            </div>
+            <div class="ai-agent-footer">
+                <input type="text" id="aiAgentInput" placeholder="Digite sua pergunta..." onkeypress="if(event.key==='Enter')sendAgentMessage()">
+                <button onclick="sendAgentMessage()">➤</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = window.location.origin;
+        let vendasChart, statusChart;
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
+        }
+
+        function toggleAgent() {
+            document.getElementById('aiAgentPanel').classList.toggle('open');
+        }
+
+        function showToast(title, message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+            toast.innerHTML = `
+                <div class="toast-icon">${icons[type]}</div>
+                <div>
+                    <div style="font-weight: 600; font-size: 0.85rem;">${title}</div>
+                    <div style="font-size: 0.8rem; opacity: 0.8;">${message}</div>
+                </div>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('toast-exit');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        async function apiFetch(endpoint, options = {}) {
+            const response = await fetch(`${API_URL}${endpoint}`, {
+                ...options,
+                headers: { 'Content-Type': 'application/json', ...options.headers }
+            });
+            return response.json();
+        }
+
+        function formatMoney(value) {
+            return 'R$ ' + value.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
+
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('pt-BR') + ' ' + date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function getStatusLabel(status) {
+            const labels = {
+                'pending': '⏳ Pendente',
+                'approved': '✅ Aprovado',
+                'shipped': '🚚 Enviado',
+                'delivered': '📦 Entregue',
+                'canceled': '❌ Cancelado'
+            };
+            return labels[status] || status;
+        }
+
+        function getStatusClass(status) {
+            return `status status-${status}`;
+        }
+
+        // Carregar dashboard
+        async function loadDashboard() {
+            try {
+                const data = await apiFetch('/api/dashboard');
+
+                // Atualizar stats
+                document.getElementById('statVendas').textContent = formatMoney(data.metrics.total_vendas);
+                document.getElementById('statPedidos').textContent = data.metrics.total_pedidos;
+                document.getElementById('statClientes').textContent = data.metrics.total_clientes;
+                document.getElementById('statTicket').textContent = formatMoney(data.metrics.ticket_medio);
+
+                // Atualizar badges
+                const pendentes = data.status_count['pending'] || 0;
+                const estoqueBaixo = data.metrics.produtos_baixo_estoque;
+                document.getElementById('badgePedidos').textContent = pendentes;
+                document.getElementById('badgeProdutos').textContent = estoqueBaixo;
+
+                // Gráfico de vendas
+                const vendasCtx = document.getElementById('vendasChart').getContext('2d');
+                if (vendasChart) vendasChart.destroy();
+                vendasChart = new Chart(vendasCtx, {
+                    type: 'line',
+                    data: {
+                        labels: data.vendas_por_dia.map(d => d.dia),
+                        datasets: [{
+                            label: 'Vendas (R$)',
+                            data: data.vendas_por_dia.map(d => d.valor),
+                            borderColor: '#6366f1',
+                            backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#6366f1'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: v => 'R$ ' + v,
+                                    color: '#6b6b80'
+                                },
+                                grid: { color: 'rgba(255,255,255,0.05)' }
+                            },
+                            x: {
+                                ticks: { color: '#6b6b80' },
+                                grid: { display: false }
+                            }
+                        }
+                    }
+                });
+
+                // Gráfico de status
+                const statusCtx = document.getElementById('statusChart').getContext('2d');
+                if (statusChart) statusChart.destroy();
+                const statusColors = {
+                    'pending': '#f59e0b',
+                    'approved': '#22c55e',
+                    'shipped': '#3b82f6',
+                    'delivered': '#6366f1',
+                    'canceled': '#ef4444'
+                };
+                statusChart = new Chart(statusCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(data.status_count).map(s => getStatusLabel(s)),
+                        datasets: [{
+                            data: Object.values(data.status_count),
+                            backgroundColor: Object.keys(data.status_count).map(s => statusColors[s] || '#6366f1'),
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: { color: '#a1a1b3', font: { size: 12 } }
+                            }
+                        }
+                    }
+                });
+
+                // Atividades
+                const atividadesHtml = data.atividades.map(a => `
+                    <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; border-bottom: 1px solid var(--border); ${a.read ? '' : 'background: rgba(99, 102, 241, 0.05);'}">
+                        <div style="font-size: 1.25rem;">${a.type === 'order' ? '📦' : a.type === 'alert' ? '⚠️' : a.type === 'success' ? '✅' : 'ℹ️'}</div>
+                        <div style="flex: 1;">
+                            <div style="font-size: 0.85rem;">${a.message}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">${formatDate(a.time)}</div>
+                        </div>
+                        ${!a.read ? '<div style="width: 8px; height: 8px; background: var(--accent); border-radius: 50%;"></div>' : ''}
+                    </div>
+                `).join('');
+                document.getElementById('atividadesList').innerHTML = atividadesHtml || '<div class="empty-state"><div class="empty-state-icon">📭</div><p>Nenhuma atividade recente</p></div>';
+
+                // Pedidos recentes
+                const pedidosHtml = data.pedidos_recentes.map(p => `
+                    <tr>
+                        <td><strong>#${p.id}</strong></td>
+                        <td>${p.customer.name}</td>
+                        <td>${formatMoney(p.total)}</td>
+                        <td><span class="${getStatusClass(p.status)}">${getStatusLabel(p.status)}</span></td>
+                        <td>${formatDate(p.created_at)}</td>
+                    </tr>
+                `).join('');
+                document.getElementById('pedidosRecentes').innerHTML = pedidosHtml;
+
+            } catch (e) {
+                console.error('Erro ao carregar dashboard:', e);
+                showToast('Erro', 'Falha ao carregar dados', 'error');
+            }
+        }
+
+        async function marcarTodasLidas() {
+            try {
+                await apiFetch('/api/atividades/ler', { method: 'POST' });
+                loadDashboard();
+                showToast('Sucesso', 'Todas as atividades marcadas como lidas');
+            } catch (e) {
+                showToast('Erro', 'Falha ao marcar atividades', 'error');
+            }
+        }
+
+        function atualizarDados() {
+            loadDashboard();
+            showToast('Atualizado', 'Dados atualizados com sucesso');
+        }
+
+        // AI Agent
+        async function sendAgentMessage(text) {
+            const input = document.getElementById('aiAgentInput');
+            const message = text || input.value;
+            if (!message.trim()) return;
+
+            const body = document.getElementById('aiAgentBody');
+
+            // Adicionar mensagem do usuário
+            body.insertAdjacentHTML('beforeend', `
+                <div class="ai-message user">${message}</div>
+            `);
+
+            // Limpar input
+            if (!text) input.value = '';
+
+            // Mostrar typing
+            const typingId = 'typing-' + Date.now();
+            body.insertAdjacentHTML('beforeend', `
+                <div class="ai-message typing" id="${typingId}">
+                    <span></span><span></span><span></span>
+                </div>
+            `);
+
+            body.scrollTop = body.scrollHeight;
+
+            try {
+                const response = await apiFetch('/api/chat', {
+                    method: 'POST',
+                    body: JSON.stringify({ message })
+                });
+
+                // Remover typing
+                document.getElementById(typingId)?.remove();
+
+                // Adicionar resposta
+                body.insertAdjacentHTML('beforeend', `
+                    <div class="ai-message bot">${response.message}</div>
+                `);
+
+                body.scrollTop = body.scrollHeight;
+
+            } catch (e) {
+                document.getElementById(typingId)?.remove();
+                body.insertAdjacentHTML('beforeend', `
+                    <div class="ai-message bot">❌ Desculpe, tive um problema. Tente novamente!</div>
+                `);
+            }
+        }
+
+        // Navegação entre páginas
+        function showPage(page) {
+            if (page === 'dashboard') {
+                loadDashboard();
+                return;
+            }
+            // Redirecionar para páginas separadas
+            const pages = {
+                'pedidos': '/pedidos',
+                'produtos': '/produtos',
+                'clientes': '/clientes',
+                'relatorios': '/relatorios',
+                'conectar': '/conectar'
+            };
+            if (pages[page]) {
+                window.location.href = pages[page];
+            }
+        }
+
+        // Atualizar nav active
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDashboard();
+        });
+    </script>
+</body>
+</html>

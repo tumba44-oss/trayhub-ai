@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conectar Tray - TrayHub AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/base.css">
+</head>
+<body>
+    <div class="mobile-header">
+        <button class="mobile-menu-btn" onclick="toggleSidebar()">
+            <span></span><span></span><span></span>
+        </button>
+        <div class="logo-text">TrayHub <span>AI</span></div>
+        <div style="width: 36px;"></div>
+    </div>
+
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="app">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">🤖</div>
+                    <div class="logo-text">TrayHub <span>AI</span></div>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title">Menu Principal</div>
+                <button class="nav-item" onclick="goTo('/index.html')">
+                    <span class="nav-icon">📊</span> Dashboard
+                </button>
+                <button class="nav-item" onclick="goTo('/pedidos')">
+                    <span class="nav-icon">📦</span> Pedidos
+                    <span class="nav-badge" id="badgePedidos">0</span>
+                </button>
+                <button class="nav-item" onclick="goTo('/produtos')">
+                    <span class="nav-icon">🏷️</span> Produtos
+                    <span class="nav-badge" id="badgeProdutos">0</span>
+                </button>
+                <button class="nav-item" onclick="goTo('/clientes')">
+                    <span class="nav-icon">👥</span> Clientes
+                </button>
+                <button class="nav-item" onclick="goTo('/relatorios')">
+                    <span class="nav-icon">📈</span> Relatórios
+                </button>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title">Sistema</div>
+                <button class="nav-item active" onclick="goTo('/conectar')">
+                    <span class="nav-icon">🔌</span> Conectar Tray
+                </button>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">A</div>
+                    <div class="user-details">
+                        <div class="user-name">Administrador</div>
+                        <div class="user-role">Loja Demo</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main">
+            <div class="header">
+                <div class="header-title">
+                    <h1>🔌 Conectar Tray</h1>
+                    <p>Conecte sua loja Tray ao TrayHub AI</p>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">🔗 Conexão OAuth</h3>
+                    </div>
+                    <div style="padding: 1rem 0;">
+                        <div class="form-group">
+                            <label class="form-label">Subdomínio da Loja</label>
+                            <input type="text" class="form-input" id="traySubdominio" placeholder="Ex: minhaloja">
+                            <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">Sem .tray.com.br</p>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Consumer Key</label>
+                            <input type="text" class="form-input" id="trayConsumerKey" placeholder="Sua consumer key">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Consumer Secret</label>
+                            <input type="password" class="form-input" id="trayConsumerSecret" placeholder="Sua consumer secret">
+                        </div>
+                        <button class="btn btn-primary" style="width: 100%;" onclick="conectarTray()">
+                            🔗 Conectar Loja
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">📋 Como Conectar</h3>
+                    </div>
+                    <div style="padding: 1rem 0;">
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                            <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
+                                <div style="width: 28px; height: 28px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 600; flex-shrink: 0;">1</div>
+                                <div>
+                                    <div style="font-weight: 600; font-size: 0.9rem;">Crie um aplicativo</div>
+                                    <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem;">Acesse <a href="https://developers.tray.com.br" target="_blank" style="color: var(--accent-light);">developers.tray.com.br</a> e crie seu app</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
+                                <div style="width: 28px; height: 28px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 600; flex-shrink: 0;">2</div>
+                                <div>
+                                    <div style="font-weight: 600; font-size: 0.9rem;">Obtenha as chaves</div>
+                                    <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem;">Copie a Consumer Key e Consumer Secret do seu app</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
+                                <div style="width: 28px; height: 28px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 600; flex-shrink: 0;">3</div>
+                                <div>
+                                    <div style="font-weight: 600; font-size: 0.9rem;">Conecte</div>
+                                    <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem;">Preencha os campos ao lado e clique em "Conectar Loja"</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section" style="margin-top: 1.5rem;">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">ℹ️ Informações da Conexão</h3>
+                    </div>
+                    <div style="padding: 1rem 0;">
+                        <div id="connectionInfo">
+                            <div class="alert alert-warning">
+                                ⚠️ Nenhuma loja conectada. Use o modo demo para testar o TrayHub AI.
+                            </div>
+                        </div>
+                        <div style="margin-top: 1rem; display: flex; gap: 0.75rem;">
+                            <button class="btn btn-outline" onclick="usarDemo()">
+                                🎮 Usar Modo Demo
+                            </button>
+                            <button class="btn btn-outline" onclick="testarConexao()">
+                                🧪 Testar Conexão
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- AI Agent -->
+    <div class="ai-agent">
+        <button class="ai-agent-toggle" onclick="toggleAgent()">🤖</button>
+        <div class="ai-agent-panel" id="aiAgentPanel">
+            <div class="ai-agent-header">
+                <div class="ai-agent-avatar">🤖</div>
+                <div class="ai-agent-info">
+                    <h4>TrayBot</h4>
+                    <p>Assistente de E-commerce</p>
+                </div>
+            </div>
+            <div class="ai-agent-body" id="aiAgentBody">
+                <div class="ai-message bot">
+                    Olá! Sou o <strong>TrayBot</strong>. Posso ajudar com seus pedidos, estoque e vendas!
+                </div>
+            </div>
+            <div class="ai-agent-footer">
+                <input type="text" id="aiAgentInput" placeholder="Digite sua pergunta..." onkeypress="if(event.key==='Enter')sendAgentMessage()">
+                <button onclick="sendAgentMessage()">➤</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = window.location.origin;
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
+        }
+
+        function toggleAgent() {
+            document.getElementById('aiAgentPanel').classList.toggle('open');
+        }
+
+        function goTo(url) {
+            window.location.href = url;
+        }
+
+        function showToast(title, message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+            toast.innerHTML = `
+                <div class="toast-icon">${icons[type]}</div>
+                <div>
+                    <div style="font-weight: 600; font-size: 0.85rem;">${title}</div>
+                    <div style="font-size: 0.8rem; opacity: 0.8;">${message}</div>
+                </div>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('toast-exit');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        async function apiFetch(endpoint, options = {}) {
+            const response = await fetch(`${API_URL}${endpoint}`, {
+                ...options,
+                headers: { 'Content-Type': 'application/json', ...options.headers }
+            });
+            return response.json();
+        }
+
+        async function conectarTray() {
+            const subdominio = document.getElementById('traySubdominio').value;
+            const consumerKey = document.getElementById('trayConsumerKey').value;
+            const consumerSecret = document.getElementById('trayConsumerSecret').value;
+
+            if (!subdominio || !consumerKey || !consumerSecret) {
+                showToast('Erro', 'Preencha todos os campos', 'error');
+                return;
+            }
+
+            try {
+                const response = await apiFetch('/api/conectar', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        subdominio,
+                        consumer_key: consumerKey,
+                        consumer_secret: consumerSecret
+                    })
+                });
+
+                if (response.success) {
+                    showToast('Sucesso', 'Loja conectada com sucesso!');
+                    document.getElementById('connectionInfo').innerHTML = `
+                        <div class="alert alert-success">
+                            ✅ Loja <strong>${response.loja.nome}</strong> conectada!<br>
+                            Subdomínio: ${response.loja.subdominio}.tray.com.br
+                        </div>
+                    `;
+                } else {
+                    showToast('Erro', response.error || 'Falha ao conectar', 'error');
+                }
+            } catch (e) {
+                showToast('Erro', 'Falha na conexão', 'error');
+            }
+        }
+
+        function usarDemo() {
+            showToast('Demo', 'Modo demo ativado! Redirecionando...');
+            setTimeout(() => goTo('/index.html'), 1500);
+        }
+
+        function testarConexao() {
+            showToast('Info', 'Teste de conexão em desenvolvimento', 'info');
+        }
+
+        async function sendAgentMessage(text) {
+            const input = document.getElementById('aiAgentInput');
+            const message = text || input.value;
+            if (!message.trim()) return;
+
+            const body = document.getElementById('aiAgentBody');
+            body.insertAdjacentHTML('beforeend', `<div class="ai-message user">${message}</div>`);
+            if (!text) input.value = '';
+
+            const typingId = 'typing-' + Date.now();
+            body.insertAdjacentHTML('beforeend', `<div class="ai-message typing" id="${typingId}"><span></span><span></span><span></span></div>`);
+            body.scrollTop = body.scrollHeight;
+
+            try {
+                const response = await apiFetch('/api/chat', {
+                    method: 'POST',
+                    body: JSON.stringify({ message })
+                });
+                document.getElementById(typingId)?.remove();
+                body.insertAdjacentHTML('beforeend', `<div class="ai-message bot">${response.message}</div>`);
+                body.scrollTop = body.scrollHeight;
+            } catch (e) {
+                document.getElementById(typingId)?.remove();
+                body.insertAdjacentHTML('beforeend', `<div class="ai-message bot">❌ Desculpe, tive um problema!</div>`);
+            }
+        }
+    </script>
+</body>
+</html>
