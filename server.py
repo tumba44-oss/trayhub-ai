@@ -25,6 +25,7 @@ CLIENTES_FILE = os.path.join(DATA_DIR, 'clientes.json')
 CONFIG_FILE = os.path.join(DATA_DIR, 'config.json')
 ATIVIDADES_FILE = os.path.join(DATA_DIR, 'atividades.json')
 CHAT_FILE = os.path.join(DATA_DIR, 'chat.json')
+WHATSAPP_FILE = os.path.join(DATA_DIR, 'whatsapp.json')
 
 # Dados demo para simulação (quando não há conexão Tray)
 DEMO_LOJA = {
@@ -191,6 +192,17 @@ def init_demo_data():
     
     if not os.path.exists(CONFIG_FILE):
         save_json(CONFIG_FILE, {"demo_mode": True, "created_at": datetime.now().isoformat()})
+    
+    if not os.path.exists(WHATSAPP_FILE):
+        save_json(WHATSAPP_FILE, {
+            "enabled": False,
+            "phone": "",
+            "apikey": "",
+            "webhook_url": "",
+            "auto_reply": True,
+            "notify_new_orders": True,
+            "notify_low_stock": True
+        })
 
 
 init_demo_data()
@@ -252,6 +264,9 @@ class TrayHubHandler(BaseHTTPRequestHandler):
             return
         elif path == '/clientes':
             self._serve_file(os.path.join(PUBLIC_DIR, 'clientes.html'), 'text/html')
+            return
+        elif path == '/whatsapp':
+            self._serve_file(os.path.join(PUBLIC_DIR, 'whatsapp.html'), 'text/html')
             return
         elif path == '/relatorios':
             self._serve_file(os.path.join(PUBLIC_DIR, 'relatorios.html'), 'text/html')
@@ -491,6 +506,20 @@ class TrayHubHandler(BaseHTTPRequestHandler):
             })
             return
 
+        elif path == '/api/whatsapp/config':
+            config = load_json(WHATSAPP_FILE, {})
+            self._json_response(config)
+            return
+
+        elif path == '/api/whatsapp/status':
+            config = load_json(WHATSAPP_FILE, {})
+            self._json_response({
+                'enabled': config.get('enabled', False),
+                'phone': config.get('phone', ''),
+                'connected': config.get('enabled', False) and bool(config.get('phone')) and bool(config.get('apikey'))
+            })
+            return
+
         else:
             self._json_response({'error': 'Endpoint não encontrado'}, 404)
 
@@ -643,6 +672,107 @@ class TrayHubHandler(BaseHTTPRequestHandler):
                     'error': f'Erro ao conectar: {str(e)}'
                 }, 500)
                 return
+
+        elif path == '/api/whatsapp/config':
+            # Salvar configuração do WhatsApp
+            config = {
+                'enabled': data.get('enabled', False),
+                'phone': data.get('phone', ''),
+                'apikey': data.get('apikey', ''),
+                'webhook_url': data.get('webhook_url', ''),
+                'auto_reply': data.get('auto_reply', True),
+                'notify_new_orders': data.get('notify_new_orders', True),
+                'notify_low_stock': data.get('notify_low_stock', True)
+            }
+            save_json(WHATSAPP_FILE, config)
+            self._json_response({'success': True, 'config': config})
+            return
+
+        elif path == '/api/whatsapp/send':
+            # Enviar mensagem via WhatsApp
+            config = load_json(WHATSAPP_FILE, {})
+            
+            if not config.get('enabled') or not config.get('phone') or not config.get('apikey'):
+                self._json_response({'success': False, 'error': 'WhatsApp não configurado'}, 400)
+                return
+            
+            phone = data.get('phone', config.get('phone'))
+            message = data.get('message', '')
+            
+            if not phone or not message:
+                self._json_response({'success': False, 'error': 'Telefone e mensagem são obrigatórios'}, 400)
+                return
+            
+            try:
+                # Enviar via CallMeBot API
+                url = f"https://api.callmebot.com/whatsapp.php?phone={phone}&text={urllib.parse.quote(message)}&apikey={config['apikey']}"
+                req = urllib.request.Request(url, method='GET')
+                
+                with urllib.request.urlopen(req, timeout=30) as response:
+                    result = response.read().decode('utf-8')
+                
+                # Registrar atividade
+                atividades = load_json(ATIVIDADES_FILE, [])
+                atividades.insert(0, {
+                    'id': str(len(atividades) + 1),
+                    'type': 'success',
+                    'message': f'Mensagem WhatsApp enviada para {phone}',
+                    'time': datetime.now().isoformat(),
+                    'read': False
+                })
+                save_json(ATIVIDADES_FILE, atividades)
+                
+                self._json_response({'success': True, 'result': result})
+                return
+                
+            except Exception as e:
+                self._json_response({'success': False, 'error': str(e)}, 500)
+                return
+
+        elif path == '/api/whatsapp/webhook':
+            # Receber mensagem do WhatsApp (webhook do CallMeBot)
+            # CallMeBot não tem webhook nativo, mas podemos simular
+            # Na prática, usamos polling ou outra solução
+            
+            message = data.get('message', '')
+            from_phone = data.get('from', '')
+            
+            if message and from_phone:
+                # Processar mensagem com IA
+                resposta = self._processar_mensagem_ia(message.lower(), message)
+                
+                # Enviar resposta de volta
+                config = load_json(WHATSAPP_FILE, {})
+                if config.get('enabled') and config.get('auto_reply'):
+                    try:
+                        url = f"https://api.callmebot.com/whatsapp.php?phone={from_phone}&text={urllib.parse.quote(resposta)}&apikey={config['apikey']}"
+                        req = urllib.request.Request(url, method='GET')
+                        with urllib.request.urlopen(req, timeout=30) as response:
+                            response.read()
+                    except:
+                        pass
+                
+                # Registrar no chat
+                chat = load_json(CHAT_FILE, [])
+                chat.append({
+                    'role': 'user',
+                    'message': message,
+                    'from': from_phone,
+                    'time': datetime.now().isoformat()
+                })
+                chat.append({
+                    'role': 'bot',
+                    'message': resposta,
+                    'to': from_phone,
+                    'time': datetime.now().isoformat()
+                })
+                save_json(CHAT_FILE, chat)
+                
+                self._json_response({'success': True, 'reply': resposta})
+                return
+            
+            self._json_response({'success': False, 'error': 'Dados inválidos'}, 400)
+            return
 
         else:
             self._json_response({'error': 'Endpoint não encontrado'}, 404)

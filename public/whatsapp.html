@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp - TrayHub AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/base.css">
+    <style>
+        .whatsapp-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .whatsapp-card h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .status-connected {
+            background: #ecfdf5;
+            color: #059669;
+        }
+        .status-disconnected {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+        .test-message-box {
+            background: var(--gray-50);
+            border-radius: var(--radius);
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        .qr-placeholder {
+            width: 200px;
+            height: 200px;
+            background: var(--gray-100);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 1rem auto;
+            font-size: 4rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-header">
+        <button class="mobile-menu-btn" onclick="toggleSidebar()">
+            <span></span><span></span><span></span>
+        </button>
+        <div class="logo-text">TrayHub <span>AI</span></div>
+        <div style="width: 36px;"></div>
+    </div>
+
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="app">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">T</div>
+                    <div class="logo-text">TrayHub <span>AI</span></div>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title">Menu Principal</div>
+                <button class="nav-item" onclick="goTo('/index.html')">
+                    <span class="nav-icon">⊞</span> Dashboard
+                </button>
+                <button class="nav-item" onclick="goTo('/pedidos')">
+                    <span class="nav-icon">📋</span> Pedidos
+                    <span class="nav-badge" id="badgePedidos">0</span>
+                </button>
+                <button class="nav-item" onclick="goTo('/produtos')">
+                    <span class="nav-icon">🏷️</span> Produtos
+                    <span class="nav-badge" id="badgeProdutos">0</span>
+                </button>
+                <button class="nav-item" onclick="goTo('/clientes')">
+                    <span class="nav-icon">👥</span> Clientes
+                </button>
+                <button class="nav-item" onclick="goTo('/relatorios')">
+                    <span class="nav-icon">📊</span> Relatórios
+                </button>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title">Integrações</div>
+                <button class="nav-item active" onclick="goTo('/whatsapp')">
+                    <span class="nav-icon">💬</span> WhatsApp
+                    <span class="nav-badge" id="badgeWhatsApp" style="background: var(--success);">●</span>
+                </button>
+                <button class="nav-item" onclick="goTo('/conectar')">
+                    <span class="nav-icon">🔗</span> Conectar Tray
+                </button>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">A</div>
+                    <div class="user-details">
+                        <div class="user-name">Administrador</div>
+                        <div class="user-role">Loja Demo ▼</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main">
+            <div class="header">
+                <div class="header-title">
+                    <h1>WhatsApp</h1>
+                    <p>Configure o bot do WhatsApp para seu e-commerce</p>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="whatsapp-card">
+                    <h3>📱 Status da Conexão</h3>
+                    <div id="statusContainer">
+                        <div class="status-indicator status-disconnected">
+                            <span>●</span> Desconectado
+                        </div>
+                    </div>
+                    <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-secondary);">
+                        Use o CallMeBot para enviar mensagens via WhatsApp. É gratuito e não precisa de servidor adicional.
+                    </p>
+                </div>
+
+                <div class="whatsapp-card">
+                    <h3>⚙️ Configuração</h3>
+                    <div class="form-group">
+                        <label class="form-label">Ativar WhatsApp</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="whatsappEnabled" onchange="toggleWhatsApp()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Número de Telefone (com DDD)</label>
+                        <input type="text" class="form-input" id="whatsappPhone" placeholder="554491018506" value="554491018506">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">API Key do CallMeBot</label>
+                        <input type="text" class="form-input" id="whatsappApiKey" placeholder="Sua API Key" value="1748366">
+                    </div>
+                    <button class="btn btn-primary" onclick="salvarConfig()" style="width: 100%;">
+                        💾 Salvar Configuração
+                    </button>
+                </div>
+            </div>
+
+            <div class="whatsapp-card">
+                <h3>🔔 Notificações Automáticas</h3>
+                <div class="grid-3">
+                    <div class="form-group">
+                        <label class="form-label">Auto-Resposta</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="autoReply" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">
+                            Responder automaticamente mensagens recebidas
+                        </p>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Novos Pedidos</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="notifyOrders" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">
+                            Notificar quando houver novo pedido
+                        </p>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Estoque Baixo</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="notifyStock" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">
+                            Alertar quando produto estiver acabando
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="whatsapp-card">
+                <h3>🧪 Testar Envio</h3>
+                <div class="test-message-box">
+                    <div class="form-group">
+                        <label class="form-label">Número de Destino</label>
+                        <input type="text" class="form-input" id="testPhone" placeholder="5544999999999">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Mensagem</label>
+                        <textarea class="form-input" id="testMessage" rows="3" placeholder="Digite sua mensagem...">🤖 Olá! Este é um teste do TrayHub AI. Seu bot de WhatsApp está funcionando!</textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="enviarTeste()">
+                        📤 Enviar Mensagem de Teste
+                    </button>
+                </div>
+            </div>
+
+            <div class="whatsapp-card">
+                <h3>📖 Como Funciona</h3>
+                <div style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6;">
+                    <p><strong>1.</strong> O CallMeBot permite enviar mensagens WhatsApp gratuitamente (limite de 100/dia).</p>
+                    <p><strong>2.</strong> Para ativar, envie "I allow callmebot to send me messages" para +34 644 52 53 00 no WhatsApp.</p>
+                    <p><strong>3.</strong> Você receberá uma API Key como esta: <code>1748366</code></p>
+                    <p><strong>4.</strong> Cole o número e a API Key acima e clique em Salvar.</p>
+                    <p><strong>5.</strong> O TrayBot responderá automaticamente perguntas sobre pedidos, estoque e vendas!</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const API_URL = window.location.origin;
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
+        }
+
+        function goTo(url) {
+            window.location.href = url;
+        }
+
+        function showToast(title, message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+            toast.innerHTML = `
+                <div class="toast-icon">${icons[type]}</div>
+                <div>
+                    <div style="font-weight: 600; font-size: 0.85rem;">${title}</div>
+                    <div style="font-size: 0.8rem; opacity: 0.8;">${message}</div>
+                </div>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('toast-exit');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        async function apiFetch(endpoint, options = {}) {
+            const response = await fetch(`${API_URL}${endpoint}`, {
+                ...options,
+                headers: { 'Content-Type': 'application/json', ...options.headers }
+            });
+            return response.json();
+        }
+
+        async function loadConfig() {
+            try {
+                const config = await apiFetch('/api/whatsapp/config');
+                document.getElementById('whatsappEnabled').checked = config.enabled || false;
+                document.getElementById('whatsappPhone').value = config.phone || '';
+                document.getElementById('whatsappApiKey').value = config.apikey || '';
+                document.getElementById('autoReply').checked = config.auto_reply !== false;
+                document.getElementById('notifyOrders').checked = config.notify_new_orders !== false;
+                document.getElementById('notifyStock').checked = config.notify_low_stock !== false;
+                updateStatus(config.enabled && config.phone && config.apikey);
+            } catch (e) {
+                console.error('Erro ao carregar config:', e);
+            }
+        }
+
+        function updateStatus(connected) {
+            const container = document.getElementById('statusContainer');
+            if (connected) {
+                container.innerHTML = `
+                    <div class="status-indicator status-connected">
+                        <span>●</span> Conectado
+                    </div>
+                    <p style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--success);">
+                        ✅ WhatsApp configurado e pronto para enviar mensagens!
+                    </p>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="status-indicator status-disconnected">
+                        <span>●</span> Desconectado
+                    </div>
+                    <p style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-muted);">
+                        Configure o número e API Key para conectar
+                    </p>
+                `;
+            }
+        }
+
+        async function salvarConfig() {
+            const config = {
+                enabled: document.getElementById('whatsappEnabled').checked,
+                phone: document.getElementById('whatsappPhone').value.trim(),
+                apikey: document.getElementById('whatsappApiKey').value.trim(),
+                auto_reply: document.getElementById('autoReply').checked,
+                notify_new_orders: document.getElementById('notifyOrders').checked,
+                notify_low_stock: document.getElementById('notifyStock').checked
+            };
+
+            if (config.enabled && (!config.phone || !config.apikey)) {
+                showToast('Erro', 'Preencha o número e API Key para ativar', 'error');
+                return;
+            }
+
+            try {
+                const response = await apiFetch('/api/whatsapp/config', {
+                    method: 'POST',
+                    body: JSON.stringify(config)
+                });
+
+                if (response.success) {
+                    showToast('Sucesso', 'Configuração salva!');
+                    updateStatus(config.enabled && config.phone && config.apikey);
+                } else {
+                    showToast('Erro', 'Falha ao salvar', 'error');
+                }
+            } catch (e) {
+                showToast('Erro', 'Falha ao salvar configuração', 'error');
+            }
+        }
+
+        async function enviarTeste() {
+            const phone = document.getElementById('testPhone').value.trim();
+            const message = document.getElementById('testMessage').value.trim();
+
+            if (!phone || !message) {
+                showToast('Erro', 'Preencha o número e a mensagem', 'error');
+                return;
+            }
+
+            try {
+                const response = await apiFetch('/api/whatsapp/send', {
+                    method: 'POST',
+                    body: JSON.stringify({ phone, message })
+                });
+
+                if (response.success) {
+                    showToast('Sucesso', 'Mensagem enviada! Verifique seu WhatsApp.');
+                } else {
+                    showToast('Erro', response.error || 'Falha ao enviar', 'error');
+                }
+            } catch (e) {
+                showToast('Erro', 'Falha ao enviar mensagem', 'error');
+            }
+        }
+
+        function toggleWhatsApp() {
+            const enabled = document.getElementById('whatsappEnabled').checked;
+            updateStatus(enabled);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadConfig();
+        });
+    </script>
+</body>
+</html>
