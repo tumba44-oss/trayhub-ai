@@ -23,7 +23,7 @@
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="logo">
-                    <div class="logo-icon">🤖</div>
+                    <div class="logo-icon">T</div>
                     <div class="logo-text">TrayHub <span>AI</span></div>
                 </div>
             </div>
@@ -31,10 +31,10 @@
             <div class="nav-section">
                 <div class="nav-title">Menu Principal</div>
                 <button class="nav-item" onclick="goTo('/index.html')">
-                    <span class="nav-icon">📊</span> Dashboard
+                    <span class="nav-icon">⊞</span> Dashboard
                 </button>
                 <button class="nav-item" onclick="goTo('/pedidos')">
-                    <span class="nav-icon">📦</span> Pedidos
+                    <span class="nav-icon">📋</span> Pedidos
                     <span class="nav-badge" id="badgePedidos">0</span>
                 </button>
                 <button class="nav-item active" onclick="goTo('/produtos')">
@@ -45,14 +45,14 @@
                     <span class="nav-icon">👥</span> Clientes
                 </button>
                 <button class="nav-item" onclick="goTo('/relatorios')">
-                    <span class="nav-icon">📈</span> Relatórios
+                    <span class="nav-icon">📊</span> Relatórios
                 </button>
             </div>
 
             <div class="nav-section">
                 <div class="nav-title">Sistema</div>
                 <button class="nav-item" onclick="goTo('/conectar')">
-                    <span class="nav-icon">🔌</span> Conectar Tray
+                    <span class="nav-icon">🔗</span> Conectar Tray
                 </button>
             </div>
 
@@ -61,7 +61,7 @@
                     <div class="user-avatar">A</div>
                     <div class="user-details">
                         <div class="user-name">Administrador</div>
-                        <div class="user-role">Loja Demo</div>
+                        <div class="user-role">Loja Demo ▼</div>
                     </div>
                 </div>
             </div>
@@ -70,7 +70,7 @@
         <main class="main">
             <div class="header">
                 <div class="header-title">
-                    <h1>🏷️ Produtos</h1>
+                    <h1>Produtos</h1>
                     <p>Gerencie seu catálogo e estoque</p>
                 </div>
                 <div class="header-actions">
@@ -82,14 +82,17 @@
             </div>
 
             <div class="grid-4" id="produtosGrid">
-                <!-- Produtos serão carregados aqui -->
+                <div class="empty-state" style="grid-column: 1/-1;">
+                    <div class="empty-state-icon">📭</div>
+                    <p>Nenhum produto cadastrado</p>
+                    <p style="font-size: 0.8rem; margin-top: 0.5rem;">Conecte sua loja Tray para sincronizar produtos</p>
+                </div>
             </div>
         </main>
     </div>
 
-    <!-- AI Agent -->
     <div class="ai-agent">
-        <button class="ai-agent-toggle" onclick="toggleAgent()">🤖</button>
+        <button class="ai-agent-toggle" onclick="toggleAgent()">💬</button>
         <div class="ai-agent-panel" id="aiAgentPanel">
             <div class="ai-agent-header">
                 <div class="ai-agent-avatar">🤖</div>
@@ -159,9 +162,9 @@
         }
 
         function getStockColor(stock) {
-            if (stock <= 3) return 'var(--danger)';
-            if (stock <= 8) return 'var(--warning)';
-            return 'var(--success)';
+            if (stock <= 3) return '#ef4444';
+            if (stock <= 8) return '#f59e0b';
+            return '#10b981';
         }
 
         function getStockLabel(stock) {
@@ -173,10 +176,8 @@
         async function loadProdutos() {
             try {
                 const data = await apiFetch('/api/produtos');
-                todosProdutos = data.produtos;
+                todosProdutos = data.produtos || [];
                 renderProdutos();
-
-                // Atualizar badge
                 const alertas = todosProdutos.filter(p => p.stock <= 5).length;
                 document.getElementById('badgeProdutos').textContent = alertas;
             } catch (e) {
@@ -222,7 +223,11 @@
                 </div>
             `).join('');
 
-            document.getElementById('produtosGrid').innerHTML = html || '<div class="empty-state" style="grid-column: 1/-1;"><div class="empty-state-icon">📭</div><p>Nenhum produto encontrado</p></div>';
+            document.getElementById('produtosGrid').innerHTML = html || `
+                <div class="empty-state" style="grid-column: 1/-1;">
+                    <div class="empty-state-icon">📭</div>
+                    <p>Nenhum produto encontrado</p>
+                </div>`;
         }
 
         function filtrarProdutos() {
@@ -235,8 +240,6 @@
                 showToast('Info', 'Nenhum produto com estoque baixo', 'info');
                 return;
             }
-
-            const lista = alertas.map(p => `• ${p.name}: ${p.stock} unidades`).join('\n');
             showToast('Alertas de Estoque', `${alertas.length} produtos precisam de reposição`, 'warning');
         }
 

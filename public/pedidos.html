@@ -23,7 +23,7 @@
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="logo">
-                    <div class="logo-icon">🤖</div>
+                    <div class="logo-icon">T</div>
                     <div class="logo-text">TrayHub <span>AI</span></div>
                 </div>
             </div>
@@ -31,10 +31,10 @@
             <div class="nav-section">
                 <div class="nav-title">Menu Principal</div>
                 <button class="nav-item" onclick="goTo('/index.html')">
-                    <span class="nav-icon">📊</span> Dashboard
+                    <span class="nav-icon">⊞</span> Dashboard
                 </button>
                 <button class="nav-item active" onclick="goTo('/pedidos')">
-                    <span class="nav-icon">📦</span> Pedidos
+                    <span class="nav-icon">📋</span> Pedidos
                     <span class="nav-badge" id="badgePedidos">0</span>
                 </button>
                 <button class="nav-item" onclick="goTo('/produtos')">
@@ -45,14 +45,14 @@
                     <span class="nav-icon">👥</span> Clientes
                 </button>
                 <button class="nav-item" onclick="goTo('/relatorios')">
-                    <span class="nav-icon">📈</span> Relatórios
+                    <span class="nav-icon">📊</span> Relatórios
                 </button>
             </div>
 
             <div class="nav-section">
                 <div class="nav-title">Sistema</div>
                 <button class="nav-item" onclick="goTo('/conectar')">
-                    <span class="nav-icon">🔌</span> Conectar Tray
+                    <span class="nav-icon">🔗</span> Conectar Tray
                 </button>
             </div>
 
@@ -61,7 +61,7 @@
                     <div class="user-avatar">A</div>
                     <div class="user-details">
                         <div class="user-name">Administrador</div>
-                        <div class="user-role">Loja Demo</div>
+                        <div class="user-role">Loja Demo ▼</div>
                     </div>
                 </div>
             </div>
@@ -70,7 +70,7 @@
         <main class="main">
             <div class="header">
                 <div class="header-title">
-                    <h1>📦 Pedidos</h1>
+                    <h1>Pedidos</h1>
                     <p>Gerencie todos os pedidos da sua loja</p>
                 </div>
                 <div class="header-actions">
@@ -80,6 +80,44 @@
                 </div>
             </div>
 
+            <!-- KPI Cards -->
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-icon purple">📋</div>
+                        <svg class="kpi-sparkline" viewBox="0 0 60 30"><polyline fill="none" stroke="#7c3aed" stroke-width="2" points="0,25 10,20 20,22 30,15 40,18 50,10 60,5"/></svg>
+                    </div>
+                    <div class="kpi-value" id="kpiTotalPedidos">0</div>
+                    <div class="kpi-label">Pedidos Totais</div>
+                    <div class="kpi-trend positive">↑ +12%</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-icon green">💰</div>
+                        <svg class="kpi-sparkline" viewBox="0 0 60 30"><polyline fill="none" stroke="#10b981" stroke-width="2" points="0,20 10,18 20,22 30,15 40,12 50,8 60,5"/></svg>
+                    </div>
+                    <div class="kpi-value" id="kpiFaturamento">R$ 0,00</div>
+                    <div class="kpi-label">Faturamento</div>
+                    <div class="kpi-trend positive">↑ +5%</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-icon orange">⏰</div>
+                        <svg class="kpi-sparkline" viewBox="0 0 60 30"><polyline fill="none" stroke="#f59e0b" stroke-width="2" points="0,15 10,18 20,20 30,22 40,20 50,18 60,15"/></svg>
+                    </div>
+                    <div class="kpi-value" id="kpiPendentes">0</div>
+                    <div class="kpi-label">Pedidos Pendentes</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-icon blue">🎫</div>
+                    </div>
+                    <div class="kpi-value" id="kpiTicket">R$ 0,00</div>
+                    <div class="kpi-label">Ticket Médio</div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
             <div class="tabs">
                 <button class="tab active" onclick="filtrarPorStatus('todos')">Todos</button>
                 <button class="tab" onclick="filtrarPorStatus('pending')">⏳ Pendentes</button>
@@ -87,26 +125,51 @@
                 <button class="tab" onclick="filtrarPorStatus('shipped')">🚚 Enviados</button>
                 <button class="tab" onclick="filtrarPorStatus('delivered')">📦 Entregues</button>
                 <button class="tab" onclick="filtrarPorStatus('canceled')">❌ Cancelados</button>
+                <div style="flex:1"></div>
+                <button class="btn btn-outline btn-sm" onclick="mostrarFiltros()">
+                    🔽 Filtros Avançados
+                </button>
             </div>
 
-            <div class="card">
+            <!-- Table -->
+            <div class="card" style="padding: 0;">
                 <div class="table-container">
                     <table>
                         <thead>
                             <tr>
-                                <th>Pedido</th>
-                                <th>Cliente</th>
-                                <th>Produtos</th>
-                                <th>Total</th>
-                                <th>Status</th>
-                                <th>Data</th>
-                                <th>Ações</th>
+                                <th style="width: 40px;"><input type="checkbox" class="checkbox"></th>
+                                <th>PEDIDO</th>
+                                <th>CLIENTE</th>
+                                <th>PRODUTOS</th>
+                                <th>TOTAL</th>
+                                <th>STATUS</th>
+                                <th>DATA</th>
+                                <th style="width: 120px;">AÇÕES</th>
                             </tr>
                         </thead>
                         <tbody id="pedidosTable">
-                            <tr><td colspan="7" style="text-align: center;">Carregando...</td></tr>
+                            <tr><td colspan="8" style="text-align: center; padding: 3rem;">
+                                <div class="empty-state">
+                                    <div class="empty-state-icon">📭</div>
+                                    <p>Nenhum pedido encontrado</p>
+                                </div>
+                            </td></tr>
                         </tbody>
                     </table>
+                </div>
+                <div class="pagination">
+                    <span id="paginationInfo">Total de 0 pedidos</span>
+                    <div class="pagination-pages">
+                        <button class="page-btn active">1</button>
+                    </div>
+                    <div>
+                        <span style="font-size: 0.75rem; color: var(--text-muted);">Itens por página: </span>
+                        <select class="form-select" style="width: auto; display: inline; padding: 0.25rem 0.5rem; font-size: 0.75rem;">
+                            <option>10</option>
+                            <option selected>25</option>
+                            <option>50</option>
+                        </select>
+                    </div>
                 </div>
             </div>
         </main>
@@ -114,7 +177,7 @@
 
     <!-- AI Agent -->
     <div class="ai-agent">
-        <button class="ai-agent-toggle" onclick="toggleAgent()">🤖</button>
+        <button class="ai-agent-toggle" onclick="toggleAgent()">💬</button>
         <div class="ai-agent-panel" id="aiAgentPanel">
             <div class="ai-agent-header">
                 <div class="ai-agent-avatar">🤖</div>
@@ -125,7 +188,13 @@
             </div>
             <div class="ai-agent-body" id="aiAgentBody">
                 <div class="ai-message bot">
-                    Olá! Sou o <strong>TrayBot</strong>. Posso ajudar com seus pedidos, estoque e vendas!
+                    Olá! Sou o <strong>TrayBot</strong>, seu assistente de e-commerce. Posso ajudar você a gerenciar pedidos, monitorar estoque, analisar vendas e muito mais!
+                </div>
+                <div class="ai-suggestions">
+                    <button class="ai-suggestion" onclick="sendAgentMessage('Quantos pedidos pendentes?')">Pedidos pendentes</button>
+                    <button class="ai-suggestion" onclick="sendAgentMessage('Qual o estoque atual?')">Ver estoque</button>
+                    <button class="ai-suggestion" onclick="sendAgentMessage('Quanto vendi hoje?')">Vendas hoje</button>
+                    <button class="ai-suggestion" onclick="sendAgentMessage('Me dê uma dica de vendas')">Dica de vendas</button>
                 </div>
             </div>
             <div class="ai-agent-footer">
@@ -222,14 +291,37 @@
             return actions[status] || null;
         }
 
+        function getAvatarColor(name) {
+            const colors = ['#7c3aed', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
+            let hash = 0;
+            for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+            return colors[Math.abs(hash) % colors.length];
+        }
+
         async function loadPedidos() {
             try {
                 const data = await apiFetch('/api/pedidos');
-                todosPedidos = data.pedidos;
+                todosPedidos = data.pedidos || [];
+                updateKPIs();
                 renderPedidos();
             } catch (e) {
                 showToast('Erro', 'Falha ao carregar pedidos', 'error');
             }
+        }
+
+        function updateKPIs() {
+            const total = todosPedidos.length;
+            const pendentes = todosPedidos.filter(p => p.status === 'pending').length;
+            const faturamento = todosPedidos
+                .filter(p => ['approved', 'shipped', 'delivered'].includes(p.status))
+                .reduce((sum, p) => sum + p.total, 0);
+            const ticket = total > 0 ? faturamento / total : 0;
+
+            document.getElementById('kpiTotalPedidos').textContent = total.toLocaleString('pt-BR');
+            document.getElementById('kpiFaturamento').textContent = formatMoney(faturamento);
+            document.getElementById('kpiPendentes').textContent = pendentes;
+            document.getElementById('kpiTicket').textContent = formatMoney(ticket);
+            document.getElementById('badgePedidos').textContent = pendentes;
         }
 
         function renderPedidos() {
@@ -248,36 +340,79 @@
                 );
             }
 
+            document.getElementById('paginationInfo').textContent = `Total de ${pedidos.length} pedidos`;
+
             const html = pedidos.map(p => {
                 const nextStatus = getNextStatus(p.status);
                 const actionLabel = getStatusAction(p.status);
                 const produtosList = p.items.map(i => i.name).join(', ');
+                const avatarColor = getAvatarColor(p.customer.name);
 
                 return `
                     <tr>
-                        <td><strong>#${p.id}</strong></td>
+                        <td><input type="checkbox" class="checkbox"></td>
+                        <td><strong style="color: var(--primary);">#${p.id}</strong></td>
                         <td>
-                            <div style="font-weight: 500;">${p.customer.name}</div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted);">${p.customer.email}</div>
+                            <div style="display: flex; align-items: center; gap: 0.625rem;">
+                                <div class="avatar-initial" style="background: ${avatarColor};">${p.customer.name.charAt(0)}</div>
+                                <div>
+                                    <div style="font-weight: 600; color: var(--text-primary);">${p.customer.name}</div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted);">${p.customer.email}</div>
+                                </div>
+                            </div>
                         </td>
                         <td>
                             <div style="font-size: 0.8rem; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${produtosList}</div>
                         </td>
-                        <td><strong>${formatMoney(p.total)}</strong></td>
+                        <td><strong style="color: var(--text-primary);">${formatMoney(p.total)}</strong></td>
                         <td><span class="${getStatusClass(p.status)}">${getStatusLabel(p.status)}</span></td>
-                        <td>${formatDate(p.created_at)}</td>
+                        <td style="font-size: 0.8rem;">${formatDate(p.created_at)}</td>
                         <td>
-                            <div style="display: flex; gap: 0.5rem;">
+                            <div style="display: flex; gap: 0.4rem; align-items: center;">
                                 ${actionLabel ? `<button class="btn btn-primary btn-sm" onclick="atualizarStatus('${p.id}', '${nextStatus}')">${actionLabel}</button>` : ''}
-                                ${p.status === 'pending' ? `<button class="btn btn-danger btn-sm" onclick="atualizarStatus('${p.id}', 'canceled')">Cancelar</button>` : ''}
+                                <div class="dropdown" id="dropdown-${p.id}">
+                                    <button class="btn-more" onclick="toggleDropdown('${p.id}')">⋯</button>
+                                    <div class="dropdown-menu" id="menu-${p.id}">
+                                        ${p.status === 'pending' ? `<button class="dropdown-item" onclick="atualizarStatus('${p.id}', 'approved')">Aprovar</button>` : ''}
+                                        ${p.status === 'pending' ? `<button class="dropdown-item" onclick="atualizarStatus('${p.id}', 'canceled')">Cancelar</button>` : ''}
+                                        ${p.status === 'approved' ? `<button class="dropdown-item" onclick="atualizarStatus('${p.id}', 'shipped')">Enviar</button>` : ''}
+                                        ${p.status === 'shipped' ? `<button class="dropdown-item" onclick="atualizarStatus('${p.id}', 'delivered')">Marcar Entregue</button>` : ''}
+                                        ${p.status !== 'canceled' && p.status !== 'delivered' ? `<div class="dropdown-divider"></div>` : ''}
+                                        <button class="dropdown-item" onclick="verDetalhes('${p.id}')">Ver Detalhes</button>
+                                    </div>
+                                </div>
                             </div>
                         </td>
                     </tr>
                 `;
             }).join('');
 
-            document.getElementById('pedidosTable').innerHTML = html || '<tr><td colspan="7" style="text-align: center; padding: 2rem;"><div class="empty-state"><div class="empty-state-icon">📭</div><p>Nenhum pedido encontrado</p></div></td></tr>';
+            document.getElementById('pedidosTable').innerHTML = html || `
+                <tr><td colspan="8" style="text-align: center; padding: 3rem;">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <p>Nenhum pedido encontrado</p>
+                    </div>
+                </td></tr>`;
         }
+
+        function toggleDropdown(id) {
+            const menu = document.getElementById(`menu-${id}`);
+            const isOpen = menu.classList.contains('show');
+            
+            // Fechar todos
+            document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
+            
+            if (!isOpen) {
+                menu.classList.add('show');
+            }
+        }
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.dropdown')) {
+                document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
+            }
+        });
 
         function filtrarPedidos() {
             renderPedidos();
@@ -288,6 +423,14 @@
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             event.target.classList.add('active');
             renderPedidos();
+        }
+
+        function mostrarFiltros() {
+            showToast('Info', 'Filtros avançados em desenvolvimento', 'info');
+        }
+
+        function verDetalhes(id) {
+            showToast('Info', `Detalhes do pedido #${id} em desenvolvimento`, 'info');
         }
 
         async function atualizarStatus(pedidoId, novoStatus) {

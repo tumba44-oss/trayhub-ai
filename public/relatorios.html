@@ -24,7 +24,7 @@
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="logo">
-                    <div class="logo-icon">🤖</div>
+                    <div class="logo-icon">T</div>
                     <div class="logo-text">TrayHub <span>AI</span></div>
                 </div>
             </div>
@@ -32,10 +32,10 @@
             <div class="nav-section">
                 <div class="nav-title">Menu Principal</div>
                 <button class="nav-item" onclick="goTo('/index.html')">
-                    <span class="nav-icon">📊</span> Dashboard
+                    <span class="nav-icon">⊞</span> Dashboard
                 </button>
                 <button class="nav-item" onclick="goTo('/pedidos')">
-                    <span class="nav-icon">📦</span> Pedidos
+                    <span class="nav-icon">📋</span> Pedidos
                     <span class="nav-badge" id="badgePedidos">0</span>
                 </button>
                 <button class="nav-item" onclick="goTo('/produtos')">
@@ -46,14 +46,14 @@
                     <span class="nav-icon">👥</span> Clientes
                 </button>
                 <button class="nav-item active" onclick="goTo('/relatorios')">
-                    <span class="nav-icon">📈</span> Relatórios
+                    <span class="nav-icon">📊</span> Relatórios
                 </button>
             </div>
 
             <div class="nav-section">
                 <div class="nav-title">Sistema</div>
                 <button class="nav-item" onclick="goTo('/conectar')">
-                    <span class="nav-icon">🔌</span> Conectar Tray
+                    <span class="nav-icon">🔗</span> Conectar Tray
                 </button>
             </div>
 
@@ -62,7 +62,7 @@
                     <div class="user-avatar">A</div>
                     <div class="user-details">
                         <div class="user-name">Administrador</div>
-                        <div class="user-role">Loja Demo</div>
+                        <div class="user-role">Loja Demo ▼</div>
                     </div>
                 </div>
             </div>
@@ -71,7 +71,7 @@
         <main class="main">
             <div class="header">
                 <div class="header-title">
-                    <h1>📈 Relatórios</h1>
+                    <h1>Relatórios</h1>
                     <p>Análise completa do seu e-commerce</p>
                 </div>
                 <div class="header-actions">
@@ -79,60 +79,66 @@
                 </div>
             </div>
 
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon green">💰</div>
-                    <div class="stat-value" id="relTotalVendas">R$ 0,00</div>
-                    <div class="stat-label">Total em Vendas</div>
+            <div class="kpi-grid" style="grid-template-columns: repeat(3, 1fr);">
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-icon green">💰</div>
+                    </div>
+                    <div class="kpi-value" id="relTotalVendas">R$ 0,00</div>
+                    <div class="kpi-label">Total em Vendas</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon blue">📦</div>
-                    <div class="stat-value" id="relTotalPedidos">0</div>
-                    <div class="stat-label">Total de Pedidos</div>
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-icon purple">📋</div>
+                    </div>
+                    <div class="kpi-value" id="relTotalPedidos">0</div>
+                    <div class="kpi-label">Total de Pedidos</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon purple">📊</div>
-                    <div class="stat-value" id="relTaxaConversao">0%</div>
-                    <div class="stat-label">Taxa de Conversão</div>
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-icon blue">📊</div>
+                    </div>
+                    <div class="kpi-value" id="relTaxaConversao">0%</div>
+                    <div class="kpi-label">Taxa de Conversão</div>
                 </div>
             </div>
 
             <div class="grid-2">
-                <div class="card">
-                    <div class="card-header">
+                <div class="card" style="padding: 0;">
+                    <div class="card-header" style="padding: 1.25rem 1.25rem 0;">
                         <h3 class="card-title">🏆 Top Produtos</h3>
                     </div>
                     <div class="table-container">
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Produto</th>
-                                    <th>Vendas</th>
-                                    <th>Preço</th>
+                                    <th>PRODUTO</th>
+                                    <th>VENDAS</th>
+                                    <th>PREÇO</th>
                                 </tr>
                             </thead>
                             <tbody id="topProdutosTable">
-                                <tr><td colspan="3" style="text-align: center;">Carregando...</td></tr>
+                                <tr><td colspan="3" style="text-align: center; padding: 2rem;"><div class="empty-state"><div class="empty-state-icon">📭</div><p>Nenhum dado disponível</p></div></td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                <div class="card">
-                    <div class="card-header">
+                <div class="card" style="padding: 0;">
+                    <div class="card-header" style="padding: 1.25rem 1.25rem 0;">
                         <h3 class="card-title">👥 Clientes Mais Valiosos</h3>
                     </div>
                     <div class="table-container">
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Cliente</th>
-                                    <th>Pedidos</th>
-                                    <th>Total</th>
+                                    <th>CLIENTE</th>
+                                    <th>PEDIDOS</th>
+                                    <th>TOTAL</th>
                                 </tr>
                             </thead>
                             <tbody id="topClientesTable">
-                                <tr><td colspan="3" style="text-align: center;">Carregando...</td></tr>
+                                <tr><td colspan="3" style="text-align: center; padding: 2rem;"><div class="empty-state"><div class="empty-state-icon">📭</div><p>Nenhum dado disponível</p></div></td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -150,9 +156,8 @@
         </main>
     </div>
 
-    <!-- AI Agent -->
     <div class="ai-agent">
-        <button class="ai-agent-toggle" onclick="toggleAgent()">🤖</button>
+        <button class="ai-agent-toggle" onclick="toggleAgent()">💬</button>
         <div class="ai-agent-panel" id="aiAgentPanel">
             <div class="ai-agent-header">
                 <div class="ai-agent-avatar">🤖</div>
@@ -221,81 +226,95 @@
             return 'R$ ' + value.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
         }
 
+        function getAvatarColor(name) {
+            const colors = ['#7c3aed', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
+            let hash = 0;
+            for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+            return colors[Math.abs(hash) % colors.length];
+        }
+
         async function loadRelatorios() {
             try {
                 const data = await apiFetch('/api/relatorios');
 
-                // Stats
                 document.getElementById('relTotalVendas').textContent = formatMoney(data.total_vendas);
                 document.getElementById('relTotalPedidos').textContent = data.total_pedidos;
                 document.getElementById('relTaxaConversao').textContent = data.taxa_conversao + '%';
 
-                // Top produtos
-                const produtosHtml = data.top_produtos.map(p => `
-                    <tr>
-                        <td>
-                            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <span style="font-size: 1.25rem;">${p.image}</span>
-                                <span>${p.name}</span>
-                            </div>
-                        </td>
-                        <td><strong>${p.sales}</strong></td>
-                        <td>${formatMoney(p.price)}</td>
-                    </tr>
-                `).join('');
-                document.getElementById('topProdutosTable').innerHTML = produtosHtml;
+                if (data.top_produtos && data.top_produtos.length > 0) {
+                    const produtosHtml = data.top_produtos.map(p => `
+                        <tr>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <span style="font-size: 1.25rem;">${p.image}</span>
+                                    <span style="font-weight: 500;">${p.name}</span>
+                                </div>
+                            </td>
+                            <td><strong>${p.sales}</strong></td>
+                            <td>${formatMoney(p.price)}</td>
+                        </tr>
+                    `).join('');
+                    document.getElementById('topProdutosTable').innerHTML = produtosHtml;
+                }
 
-                // Top clientes
-                const clientesHtml = data.top_clientes.map(c => `
-                    <tr>
-                        <td>
-                            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <div style="width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent-light)); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.8rem;">${c.name.charAt(0)}</div>
-                                <span>${c.name}</span>
-                            </div>
-                        </td>
-                        <td><strong>${c.orders}</strong></td>
-                        <td><strong style="color: var(--success);">${formatMoney(c.total_spent)}</strong></td>
-                    </tr>
-                `).join('');
-                document.getElementById('topClientesTable').innerHTML = clientesHtml;
+                if (data.top_clientes && data.top_clientes.length > 0) {
+                    const clientesHtml = data.top_clientes.map(c => {
+                        const avatarColor = getAvatarColor(c.name);
+                        return `
+                            <tr>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <div class="avatar-initial" style="background: ${avatarColor}; width: 28px; height: 28px; font-size: 0.75rem;">${c.name.charAt(0)}</div>
+                                        <span style="font-weight: 500;">${c.name}</span>
+                                    </div>
+                                </td>
+                                <td><strong>${c.orders}</strong></td>
+                                <td><strong style="color: var(--success);">${formatMoney(c.total_spent)}</strong></td>
+                            </tr>
+                        `;
+                    }).join('');
+                    document.getElementById('topClientesTable').innerHTML = clientesHtml;
+                }
 
-                // Gráfico de categorias
                 const ctx = document.getElementById('categoriaChart').getContext('2d');
                 if (categoriaChart) categoriaChart.destroy();
-                categoriaChart = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: Object.keys(data.vendas_categoria),
-                        datasets: [{
-                            label: 'Vendas (R$)',
-                            data: Object.values(data.vendas_categoria),
-                            backgroundColor: 'rgba(99, 102, 241, 0.8)',
-                            borderRadius: 6
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: { legend: { display: false } },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    callback: v => 'R$ ' + v,
-                                    color: '#6b6b80'
+                
+                const labels = Object.keys(data.vendas_categoria || {});
+                const values = Object.values(data.vendas_categoria || {});
+                
+                if (labels.length > 0) {
+                    categoriaChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Vendas (R$)',
+                                data: values,
+                                backgroundColor: '#7c3aed',
+                                borderRadius: 6,
+                                barThickness: 40
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: { callback: v => 'R$ ' + v, color: '#9ca3af', font: { size: 11 } },
+                                    grid: { color: '#f3f4f6' }
                                 },
-                                grid: { color: 'rgba(255,255,255,0.05)' }
-                            },
-                            x: {
-                                ticks: { color: '#6b6b80' },
-                                grid: { display: false }
+                                x: {
+                                    ticks: { color: '#6b7280', font: { size: 12 } },
+                                    grid: { display: false }
+                                }
                             }
                         }
-                    }
-                });
+                    });
+                }
 
             } catch (e) {
-                showToast('Erro', 'Falha ao carregar relatórios', 'error');
+                console.error('Erro ao carregar relatórios:', e);
             }
         }
 

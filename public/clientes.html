@@ -23,7 +23,7 @@
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="logo">
-                    <div class="logo-icon">🤖</div>
+                    <div class="logo-icon">T</div>
                     <div class="logo-text">TrayHub <span>AI</span></div>
                 </div>
             </div>
@@ -31,10 +31,10 @@
             <div class="nav-section">
                 <div class="nav-title">Menu Principal</div>
                 <button class="nav-item" onclick="goTo('/index.html')">
-                    <span class="nav-icon">📊</span> Dashboard
+                    <span class="nav-icon">⊞</span> Dashboard
                 </button>
                 <button class="nav-item" onclick="goTo('/pedidos')">
-                    <span class="nav-icon">📦</span> Pedidos
+                    <span class="nav-icon">📋</span> Pedidos
                     <span class="nav-badge" id="badgePedidos">0</span>
                 </button>
                 <button class="nav-item" onclick="goTo('/produtos')">
@@ -45,14 +45,14 @@
                     <span class="nav-icon">👥</span> Clientes
                 </button>
                 <button class="nav-item" onclick="goTo('/relatorios')">
-                    <span class="nav-icon">📈</span> Relatórios
+                    <span class="nav-icon">📊</span> Relatórios
                 </button>
             </div>
 
             <div class="nav-section">
                 <div class="nav-title">Sistema</div>
                 <button class="nav-item" onclick="goTo('/conectar')">
-                    <span class="nav-icon">🔌</span> Conectar Tray
+                    <span class="nav-icon">🔗</span> Conectar Tray
                 </button>
             </div>
 
@@ -61,7 +61,7 @@
                     <div class="user-avatar">A</div>
                     <div class="user-details">
                         <div class="user-name">Administrador</div>
-                        <div class="user-role">Loja Demo</div>
+                        <div class="user-role">Loja Demo ▼</div>
                     </div>
                 </div>
             </div>
@@ -70,7 +70,7 @@
         <main class="main">
             <div class="header">
                 <div class="header-title">
-                    <h1>👥 Clientes</h1>
+                    <h1>Clientes</h1>
                     <p>Gerencie sua base de clientes</p>
                 </div>
                 <div class="header-actions">
@@ -80,20 +80,26 @@
                 </div>
             </div>
 
-            <div class="card">
+            <div class="card" style="padding: 0;">
                 <div class="table-container">
                     <table>
                         <thead>
                             <tr>
-                                <th>Cliente</th>
-                                <th>Contato</th>
-                                <th>Pedidos</th>
-                                <th>Total Gasto</th>
-                                <th>Última Compra</th>
+                                <th>CLIENTE</th>
+                                <th>CONTATO</th>
+                                <th>PEDIDOS</th>
+                                <th>TOTAL GASTO</th>
+                                <th>ÚLTIMA COMPRA</th>
                             </tr>
                         </thead>
                         <tbody id="clientesTable">
-                            <tr><td colspan="5" style="text-align: center;">Carregando...</td></tr>
+                            <tr><td colspan="5" style="text-align: center; padding: 3rem;">
+                                <div class="empty-state">
+                                    <div class="empty-state-icon">📭</div>
+                                    <p>Nenhum cliente cadastrado</p>
+                                    <p style="font-size: 0.8rem; margin-top: 0.5rem;">Conecte sua loja Tray para sincronizar clientes</p>
+                                </div>
+                            </td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -101,9 +107,8 @@
         </main>
     </div>
 
-    <!-- AI Agent -->
     <div class="ai-agent">
-        <button class="ai-agent-toggle" onclick="toggleAgent()">🤖</button>
+        <button class="ai-agent-toggle" onclick="toggleAgent()">💬</button>
         <div class="ai-agent-panel" id="aiAgentPanel">
             <div class="ai-agent-header">
                 <div class="ai-agent-avatar">🤖</div>
@@ -177,10 +182,17 @@
             return date.toLocaleDateString('pt-BR');
         }
 
+        function getAvatarColor(name) {
+            const colors = ['#7c3aed', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
+            let hash = 0;
+            for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+            return colors[Math.abs(hash) % colors.length];
+        }
+
         async function loadClientes() {
             try {
                 const data = await apiFetch('/api/clientes');
-                todosClientes = data.clientes;
+                todosClientes = data.clientes || [];
                 renderClientes();
             } catch (e) {
                 showToast('Erro', 'Falha ao carregar clientes', 'error');
@@ -199,27 +211,36 @@
                 );
             }
 
-            const html = clientes.map(c => `
-                <tr>
-                    <td>
-                        <div style="display: flex; align-items: center; gap: 0.75rem;">
-                            <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent-light)); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.9rem;">${c.name.charAt(0)}</div>
-                            <div>
-                                <div style="font-weight: 600;">${c.name}</div>
+            const html = clientes.map(c => {
+                const avatarColor = getAvatarColor(c.name);
+                return `
+                    <tr>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 0.625rem;">
+                                <div class="avatar-initial" style="background: ${avatarColor};">${c.name.charAt(0)}</div>
+                                <div>
+                                    <div style="font-weight: 600; color: var(--text-primary);">${c.name}</div>
+                                </div>
                             </div>
-                        </div>
-                    </td>
-                    <td>
-                        <div style="font-size: 0.85rem;">${c.email}</div>
-                        <div style="font-size: 0.8rem; color: var(--text-muted);">${c.phone}</div>
-                    </td>
-                    <td><strong>${c.orders}</strong></td>
-                    <td><strong style="color: var(--success);">${formatMoney(c.total_spent)}</strong></td>
-                    <td>${formatDate(c.last_order)}</td>
-                </tr>
-            `).join('');
+                        </td>
+                        <td>
+                            <div style="font-size: 0.85rem;">${c.email}</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">${c.phone}</div>
+                        </td>
+                        <td><strong>${c.orders}</strong></td>
+                        <td><strong style="color: var(--success);">${formatMoney(c.total_spent)}</strong></td>
+                        <td style="font-size: 0.8rem;">${formatDate(c.last_order)}</td>
+                    </tr>
+                `;
+            }).join('');
 
-            document.getElementById('clientesTable').innerHTML = html || '<tr><td colspan="5" style="text-align: center; padding: 2rem;"><div class="empty-state"><div class="empty-state-icon">📭</div><p>Nenhum cliente encontrado</p></div></td></tr>';
+            document.getElementById('clientesTable').innerHTML = html || `
+                <tr><td colspan="5" style="text-align: center; padding: 3rem;">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <p>Nenhum cliente encontrado</p>
+                    </div>
+                </td></tr>`;
         }
 
         function filtrarClientes() {

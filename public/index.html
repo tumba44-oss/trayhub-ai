@@ -24,7 +24,7 @@
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="logo">
-                    <div class="logo-icon">🤖</div>
+                    <div class="logo-icon">T</div>
                     <div class="logo-text">TrayHub <span>AI</span></div>
                 </div>
             </div>
@@ -32,28 +32,28 @@
             <div class="nav-section">
                 <div class="nav-title">Menu Principal</div>
                 <button class="nav-item active" onclick="showPage('dashboard')">
-                    <span class="nav-icon">📊</span> Dashboard
+                    <span class="nav-icon">⊞</span> Dashboard
                 </button>
-                <button class="nav-item" onclick="showPage('pedidos')">
-                    <span class="nav-icon">📦</span> Pedidos
+                <button class="nav-item" onclick="goTo('/pedidos')">
+                    <span class="nav-icon">📋</span> Pedidos
                     <span class="nav-badge" id="badgePedidos">0</span>
                 </button>
-                <button class="nav-item" onclick="showPage('produtos')">
+                <button class="nav-item" onclick="goTo('/produtos')">
                     <span class="nav-icon">🏷️</span> Produtos
                     <span class="nav-badge" id="badgeProdutos">0</span>
                 </button>
-                <button class="nav-item" onclick="showPage('clientes')">
+                <button class="nav-item" onclick="goTo('/clientes')">
                     <span class="nav-icon">👥</span> Clientes
                 </button>
-                <button class="nav-item" onclick="showPage('relatorios')">
-                    <span class="nav-icon">📈</span> Relatórios
+                <button class="nav-item" onclick="goTo('/relatorios')">
+                    <span class="nav-icon">📊</span> Relatórios
                 </button>
             </div>
 
             <div class="nav-section">
                 <div class="nav-title">Sistema</div>
-                <button class="nav-item" onclick="showPage('conectar')">
-                    <span class="nav-icon">🔌</span> Conectar Tray
+                <button class="nav-item" onclick="goTo('/conectar')">
+                    <span class="nav-icon">🔗</span> Conectar Tray
                 </button>
             </div>
 
@@ -62,18 +62,17 @@
                     <div class="user-avatar">A</div>
                     <div class="user-details">
                         <div class="user-name">Administrador</div>
-                        <div class="user-role">Loja Demo</div>
+                        <div class="user-role">Loja Demo ▼</div>
                     </div>
                 </div>
             </div>
         </aside>
 
         <main class="main" id="mainContent">
-            <!-- Dashboard -->
             <div id="page-dashboard" class="page-content">
                 <div class="header">
                     <div class="header-title">
-                        <h1>📊 Dashboard</h1>
+                        <h1>Dashboard</h1>
                         <p>Visão geral da sua loja em tempo real</p>
                     </div>
                     <div class="header-actions">
@@ -82,43 +81,54 @@
                     </div>
                 </div>
 
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon green">💰</div>
-                        <div class="stat-value" id="statVendas">R$ 0,00</div>
-                        <div class="stat-label">Total em Vendas</div>
-                        <div class="stat-change positive">+12% este mês</div>
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon green">💰</div>
+                            <svg class="kpi-sparkline" viewBox="0 0 60 30"><polyline fill="none" stroke="#10b981" stroke-width="2" points="0,25 10,20 20,22 30,15 40,18 50,10 60,5"/></svg>
+                        </div>
+                        <div class="kpi-value" id="statVendas">R$ 0,00</div>
+                        <div class="kpi-label">Total em Vendas</div>
+                        <div class="kpi-trend positive">↑ +12% este mês</div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-icon blue">📦</div>
-                        <div class="stat-value" id="statPedidos">0</div>
-                        <div class="stat-label">Total de Pedidos</div>
-                        <div class="stat-change positive">+5 hoje</div>
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon purple">📋</div>
+                            <svg class="kpi-sparkline" viewBox="0 0 60 30"><polyline fill="none" stroke="#7c3aed" stroke-width="2" points="0,20 10,18 20,15 30,18 40,12 50,10 60,8"/></svg>
+                        </div>
+                        <div class="kpi-value" id="statPedidos">0</div>
+                        <div class="kpi-label">Total de Pedidos</div>
+                        <div class="kpi-trend positive">↑ +5 hoje</div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-icon orange">👥</div>
-                        <div class="stat-value" id="statClientes">0</div>
-                        <div class="stat-label">Clientes</div>
-                        <div class="stat-change positive">+3 novos</div>
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon orange">👥</div>
+                            <svg class="kpi-sparkline" viewBox="0 0 60 30"><polyline fill="none" stroke="#f59e0b" stroke-width="2" points="0,22 10,20 20,18 30,16 40,14 50,12 60,10"/></svg>
+                        </div>
+                        <div class="kpi-value" id="statClientes">0</div>
+                        <div class="kpi-label">Clientes</div>
+                        <div class="kpi-trend positive">↑ +3 novos</div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-icon purple">📈</div>
-                        <div class="stat-value" id="statTicket">R$ 0,00</div>
-                        <div class="stat-label">Ticket Médio</div>
-                        <div class="stat-change positive">+8%</div>
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon blue">🎫</div>
+                        </div>
+                        <div class="kpi-value" id="statTicket">R$ 0,00</div>
+                        <div class="kpi-label">Ticket Médio</div>
+                        <div class="kpi-trend positive">↑ +8%</div>
                     </div>
                 </div>
 
                 <div class="grid-2">
                     <div class="card">
                         <div class="card-header">
-                            <h3 class="card-title">📈 Vendas dos Últimos 7 Dias</h3>
+                            <h3 class="card-title">Vendas dos Últimos 7 Dias</h3>
                         </div>
                         <canvas id="vendasChart" height="200"></canvas>
                     </div>
                     <div class="card">
                         <div class="card-header">
-                            <h3 class="card-title">📊 Pedidos por Status</h3>
+                            <h3 class="card-title">Pedidos por Status</h3>
                         </div>
                         <canvas id="statusChart" height="200"></canvas>
                     </div>
@@ -126,14 +136,14 @@
 
                 <div class="section" style="margin-top: 1.5rem;">
                     <div class="section-header">
-                        <h3 class="section-title">🔔 Atividades Recentes</h3>
+                        <h3 class="section-title">Atividades Recentes</h3>
                         <button class="btn btn-outline btn-sm" onclick="marcarTodasLidas()">Marcar lidas</button>
                     </div>
-                    <div class="card">
+                    <div class="card" style="padding: 0;">
                         <div id="atividadesList">
-                            <div class="empty-state">
+                            <div class="empty-state" style="padding: 2rem;">
                                 <div class="empty-state-icon">📭</div>
-                                <p>Carregando atividades...</p>
+                                <p>Nenhuma atividade recente</p>
                             </div>
                         </div>
                     </div>
@@ -141,23 +151,23 @@
 
                 <div class="section">
                     <div class="section-header">
-                        <h3 class="section-title">📦 Pedidos Recentes</h3>
-                        <button class="btn btn-outline btn-sm" onclick="showPage('pedidos')">Ver todos</button>
+                        <h3 class="section-title">Pedidos Recentes</h3>
+                        <button class="btn btn-outline btn-sm" onclick="goTo('/pedidos')">Ver todos</button>
                     </div>
-                    <div class="card">
+                    <div class="card" style="padding: 0;">
                         <div class="table-container">
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>Pedido</th>
-                                        <th>Cliente</th>
-                                        <th>Total</th>
-                                        <th>Status</th>
-                                        <th>Data</th>
+                                        <th>PEDIDO</th>
+                                        <th>CLIENTE</th>
+                                        <th>TOTAL</th>
+                                        <th>STATUS</th>
+                                        <th>DATA</th>
                                     </tr>
                                 </thead>
                                 <tbody id="pedidosRecentes">
-                                    <tr><td colspan="5" style="text-align: center;">Carregando...</td></tr>
+                                    <tr><td colspan="5" style="text-align: center; padding: 2rem;"><div class="empty-state"><div class="empty-state-icon">📭</div><p>Nenhum pedido recente</p></div></td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -167,9 +177,8 @@
         </main>
     </div>
 
-    <!-- AI Agent -->
     <div class="ai-agent">
-        <button class="ai-agent-toggle" onclick="toggleAgent()">🤖</button>
+        <button class="ai-agent-toggle" onclick="toggleAgent()">💬</button>
         <div class="ai-agent-panel" id="aiAgentPanel">
             <div class="ai-agent-header">
                 <div class="ai-agent-avatar">🤖</div>
@@ -260,24 +269,27 @@
             return `status status-${status}`;
         }
 
-        // Carregar dashboard
+        function getAvatarColor(name) {
+            const colors = ['#7c3aed', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
+            let hash = 0;
+            for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+            return colors[Math.abs(hash) % colors.length];
+        }
+
         async function loadDashboard() {
             try {
                 const data = await apiFetch('/api/dashboard');
 
-                // Atualizar stats
                 document.getElementById('statVendas').textContent = formatMoney(data.metrics.total_vendas);
-                document.getElementById('statPedidos').textContent = data.metrics.total_pedidos;
+                document.getElementById('statPedidos').textContent = data.metrics.total_pedidos.toLocaleString('pt-BR');
                 document.getElementById('statClientes').textContent = data.metrics.total_clientes;
                 document.getElementById('statTicket').textContent = formatMoney(data.metrics.ticket_medio);
 
-                // Atualizar badges
                 const pendentes = data.status_count['pending'] || 0;
                 const estoqueBaixo = data.metrics.produtos_baixo_estoque;
                 document.getElementById('badgePedidos').textContent = pendentes;
                 document.getElementById('badgeProdutos').textContent = estoqueBaixo;
 
-                // Gráfico de vendas
                 const vendasCtx = document.getElementById('vendasChart').getContext('2d');
                 if (vendasChart) vendasChart.destroy();
                 vendasChart = new Chart(vendasCtx, {
@@ -287,12 +299,14 @@
                         datasets: [{
                             label: 'Vendas (R$)',
                             data: data.vendas_por_dia.map(d => d.valor),
-                            borderColor: '#6366f1',
-                            backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                            borderColor: '#7c3aed',
+                            backgroundColor: 'rgba(124, 58, 237, 0.08)',
                             fill: true,
                             tension: 0.4,
                             pointRadius: 4,
-                            pointBackgroundColor: '#6366f1'
+                            pointBackgroundColor: '#7c3aed',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2
                         }]
                     },
                     options: {
@@ -301,26 +315,22 @@
                         scales: {
                             y: {
                                 beginAtZero: true,
-                                ticks: {
-                                    callback: v => 'R$ ' + v,
-                                    color: '#6b6b80'
-                                },
-                                grid: { color: 'rgba(255,255,255,0.05)' }
+                                ticks: { callback: v => 'R$ ' + v, color: '#9ca3af', font: { size: 11 } },
+                                grid: { color: '#f3f4f6' }
                             },
                             x: {
-                                ticks: { color: '#6b6b80' },
+                                ticks: { color: '#9ca3af', font: { size: 11 } },
                                 grid: { display: false }
                             }
                         }
                     }
                 });
 
-                // Gráfico de status
                 const statusCtx = document.getElementById('statusChart').getContext('2d');
                 if (statusChart) statusChart.destroy();
                 const statusColors = {
                     'pending': '#f59e0b',
-                    'approved': '#22c55e',
+                    'approved': '#10b981',
                     'shipped': '#3b82f6',
                     'delivered': '#6366f1',
                     'canceled': '#ef4444'
@@ -331,49 +341,60 @@
                         labels: Object.keys(data.status_count).map(s => getStatusLabel(s)),
                         datasets: [{
                             data: Object.values(data.status_count),
-                            backgroundColor: Object.keys(data.status_count).map(s => statusColors[s] || '#6366f1'),
-                            borderWidth: 0
+                            backgroundColor: Object.keys(data.status_count).map(s => statusColors[s] || '#7c3aed'),
+                            borderWidth: 0,
+                            hoverOffset: 4
                         }]
                     },
                     options: {
                         responsive: true,
+                        cutout: '65%',
                         plugins: {
                             legend: {
                                 position: 'right',
-                                labels: { color: '#a1a1b3', font: { size: 12 } }
+                                labels: { color: '#6b7280', font: { size: 12 }, usePointStyle: true, padding: 16 }
                             }
                         }
                     }
                 });
 
-                // Atividades
-                const atividadesHtml = data.atividades.map(a => `
-                    <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; border-bottom: 1px solid var(--border); ${a.read ? '' : 'background: rgba(99, 102, 241, 0.05);'}">
-                        <div style="font-size: 1.25rem;">${a.type === 'order' ? '📦' : a.type === 'alert' ? '⚠️' : a.type === 'success' ? '✅' : 'ℹ️'}</div>
-                        <div style="flex: 1;">
-                            <div style="font-size: 0.85rem;">${a.message}</div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">${formatDate(a.time)}</div>
+                if (data.atividades && data.atividades.length > 0) {
+                    const atividadesHtml = data.atividades.map(a => `
+                        <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.875rem 1.25rem; border-bottom: 1px solid var(--border-light); ${a.read ? '' : 'background: var(--primary-50);'}">
+                            <div style="font-size: 1.25rem;">${a.type === 'order' ? '📦' : a.type === 'alert' ? '⚠️' : a.type === 'success' ? '✅' : 'ℹ️'}</div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 0.85rem; color: var(--text-primary);">${a.message}</div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">${formatDate(a.time)}</div>
+                            </div>
+                            ${!a.read ? '<div style="width: 8px; height: 8px; background: var(--primary); border-radius: 50%;"></div>' : ''}
                         </div>
-                        ${!a.read ? '<div style="width: 8px; height: 8px; background: var(--accent); border-radius: 50%;"></div>' : ''}
-                    </div>
-                `).join('');
-                document.getElementById('atividadesList').innerHTML = atividadesHtml || '<div class="empty-state"><div class="empty-state-icon">📭</div><p>Nenhuma atividade recente</p></div>';
+                    `).join('');
+                    document.getElementById('atividadesList').innerHTML = atividadesHtml;
+                }
 
-                // Pedidos recentes
-                const pedidosHtml = data.pedidos_recentes.map(p => `
-                    <tr>
-                        <td><strong>#${p.id}</strong></td>
-                        <td>${p.customer.name}</td>
-                        <td>${formatMoney(p.total)}</td>
-                        <td><span class="${getStatusClass(p.status)}">${getStatusLabel(p.status)}</span></td>
-                        <td>${formatDate(p.created_at)}</td>
-                    </tr>
-                `).join('');
-                document.getElementById('pedidosRecentes').innerHTML = pedidosHtml;
+                if (data.pedidos_recentes && data.pedidos_recentes.length > 0) {
+                    const pedidosHtml = data.pedidos_recentes.map(p => {
+                        const avatarColor = getAvatarColor(p.customer.name);
+                        return `
+                            <tr>
+                                <td><strong style="color: var(--primary);">#${p.id}</strong></td>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <div class="avatar-initial" style="background: ${avatarColor}; width: 28px; height: 28px; font-size: 0.75rem;">${p.customer.name.charAt(0)}</div>
+                                        <span>${p.customer.name}</span>
+                                    </div>
+                                </td>
+                                <td><strong>${formatMoney(p.total)}</strong></td>
+                                <td><span class="${getStatusClass(p.status)}">${getStatusLabel(p.status)}</span></td>
+                                <td style="font-size: 0.8rem;">${formatDate(p.created_at)}</td>
+                            </tr>
+                        `;
+                    }).join('');
+                    document.getElementById('pedidosRecentes').innerHTML = pedidosHtml;
+                }
 
             } catch (e) {
                 console.error('Erro ao carregar dashboard:', e);
-                showToast('Erro', 'Falha ao carregar dados', 'error');
             }
         }
 
@@ -392,30 +413,17 @@
             showToast('Atualizado', 'Dados atualizados com sucesso');
         }
 
-        // AI Agent
         async function sendAgentMessage(text) {
             const input = document.getElementById('aiAgentInput');
             const message = text || input.value;
             if (!message.trim()) return;
 
             const body = document.getElementById('aiAgentBody');
-
-            // Adicionar mensagem do usuário
-            body.insertAdjacentHTML('beforeend', `
-                <div class="ai-message user">${message}</div>
-            `);
-
-            // Limpar input
+            body.insertAdjacentHTML('beforeend', `<div class="ai-message user">${message}</div>`);
             if (!text) input.value = '';
 
-            // Mostrar typing
             const typingId = 'typing-' + Date.now();
-            body.insertAdjacentHTML('beforeend', `
-                <div class="ai-message typing" id="${typingId}">
-                    <span></span><span></span><span></span>
-                </div>
-            `);
-
+            body.insertAdjacentHTML('beforeend', `<div class="ai-message typing" id="${typingId}"><span></span><span></span><span></span></div>`);
             body.scrollTop = body.scrollHeight;
 
             try {
@@ -423,45 +431,26 @@
                     method: 'POST',
                     body: JSON.stringify({ message })
                 });
-
-                // Remover typing
                 document.getElementById(typingId)?.remove();
-
-                // Adicionar resposta
-                body.insertAdjacentHTML('beforeend', `
-                    <div class="ai-message bot">${response.message}</div>
-                `);
-
+                body.insertAdjacentHTML('beforeend', `<div class="ai-message bot">${response.message}</div>`);
                 body.scrollTop = body.scrollHeight;
-
             } catch (e) {
                 document.getElementById(typingId)?.remove();
-                body.insertAdjacentHTML('beforeend', `
-                    <div class="ai-message bot">❌ Desculpe, tive um problema. Tente novamente!</div>
-                `);
+                body.insertAdjacentHTML('beforeend', `<div class="ai-message bot">❌ Desculpe, tive um problema. Tente novamente!</div>`);
             }
         }
 
-        // Navegação entre páginas
         function showPage(page) {
             if (page === 'dashboard') {
                 loadDashboard();
                 return;
             }
-            // Redirecionar para páginas separadas
-            const pages = {
-                'pedidos': '/pedidos',
-                'produtos': '/produtos',
-                'clientes': '/clientes',
-                'relatorios': '/relatorios',
-                'conectar': '/conectar'
-            };
-            if (pages[page]) {
-                window.location.href = pages[page];
-            }
         }
 
-        // Atualizar nav active
+        function goTo(url) {
+            window.location.href = url;
+        }
+
         document.querySelectorAll('.nav-item').forEach(item => {
             item.addEventListener('click', function() {
                 document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
@@ -469,7 +458,6 @@
             });
         });
 
-        // Inicializar
         document.addEventListener('DOMContentLoaded', () => {
             loadDashboard();
         });
